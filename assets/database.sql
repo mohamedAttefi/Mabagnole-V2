@@ -135,4 +135,70 @@ SELECT * FROM reservations r JOIN vehicules v on r.vehicule_id = v.id r.id = 1;
 SELECT * FROM reservations r JOIN liste_vehicules v on r.vehicule_id = v.id
 
 
+SELECT a.*, v.marque, v.modele, v.image_url, v.prix_journalier
+                FROM avis a
+                JOIN vehicules v ON a.vehicule_id = v.id
+                WHERE a.reservation_id = 1;
+
+SELECT a.*, v.marque, v.modele, v.image_url, v.prix_journalier
+                FROM avis a
+                JOIN vehicules v ON a.vehicule_id = v.id
+                WHERE a.client_id = 11
+
+SELECT 
+    v.id AS vehicule_id,
+    v.marque,
+    v.modele,
+    v.image_url,
+    v.prix_journalier,
+    AVG(a.note) AS note_moyenne,
+    count(a.client_id) as total_avis
+FROM avis a
+JOIN vehicules v ON a.vehicule_id = v.id
+WHERE a.client_id = 11
+GROUP BY v.id, v.marque, v.modele, v.image_url, v.prix_journalier;
+
+
+SELECT r.*, v.*, u.nom
+                    FROM reservations r
+                    JOIN listevehicules v ON r.vehicule_id = v.id
+                    JOIN utilisateurs u ON r.client_id = u.id where 1=1
+
+                    SELECT * from listevehicules where 1=1 and disponible = false
+
+
+SELECT 
+    u.id,
+    SUM(r.prix_total) AS total_depense
+FROM utilisateurs u
+LEFT JOIN reservations r ON u.id = r.client_id
+GROUP BY u.id;
+
+
+SELECT
+    u.id, u.nom,
+    SUM(r.prix_total) AS total_depense, count(r.id) as total_reservation
+    FROM utilisateurs u
+    LEFT JOIN reservations r ON u.id = r.client_id
+    GROUP BY u.id
+
+
+    SELECT r.*, v.marque, v.modele, v.carburant ,v.annee, v.immatriculation, v.prix_journalier, u.nom
+                    FROM reservations r
+                    JOIN listevehicules v ON r.vehicule_id = v.id
+                    JOIN utilisateurs u ON r.client_id = u.id where 1=1
+
+
+                     SELECT a.*,u.*, v.marque, v.modele, v.image_url, v.prix_journalier
+            FROM avis a
+            JOIN utilisateurs u ON a.client_id = u.id
+            JOIN vehicules v ON a.vehicule_id = v.id
+            WHERE 1=1
+            
+update vehicules set disponible = 1;
+
+     UPDATE reservations
+                SET statut = "confirmee"
+                WHERE id = 4
+
 SELECT *, c.content as commentaire, u.nom as user_name from blog_comments c join utilisateurs u on c.user_id = u.id join blog_articles a on c.article_id = a.id
