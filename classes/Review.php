@@ -62,63 +62,9 @@ class Review
         }
     }
 
-    public static function update($id, $data)
-    {
-        self::initPDO();
 
-        try {
-            $sql = "
-                UPDATE avis
-                SET note = ?, commentaire = ?, date_modification = ?
-                WHERE id = ?
-            ";
 
-            $stmt = self::$pdo->prepare($sql);
-            $result = $stmt->execute([
-                $data['note'],
-                $data['commentaire'],
-                $data['date_modification'],
-                $id
-            ]);
 
-            if ($result) {
-                // Get vehicle_id to update rating
-                $vehicle = self::find($id);
-                if ($vehicle) {
-                    self::updateVehicleRating($vehicle['vehicule_id']);
-                }
-                return true;
-            }
-            return false;
-        } catch (PDOException $e) {
-            error_log("Error in Review::update(): " . $e->getMessage());
-            return false;
-        }
-    }
-
-    public static function delete($id)
-    {
-        self::initPDO();
-
-        try {
-            // Get vehicle_id before deletion
-            $review = self::find($id);
-            $vehicle_id = $review ? $review['vehicule_id'] : null;
-
-            $sql = "DELETE FROM avis WHERE id = ?";
-            $stmt = self::$pdo->prepare($sql);
-            $result = $stmt->execute([$id]);
-
-            if ($result && $vehicle_id) {
-                self::updateVehicleRating($vehicle_id);
-                return true;
-            }
-            return false;
-        } catch (PDOException $e) {
-            error_log("Error in Review::delete(): " . $e->getMessage());
-            return false;
-        }
-    }
 
     public static function find($id)
     {
@@ -150,29 +96,74 @@ class Review
         }
     }
 
-    public static function findByUser($user_id,$reservation_id, $limit = null)
+    public static function findByAllUser($user_id = null, $reservation_id = null, $limit = null)
     {
         self::initPDO();
 
         try {
             $sql = "
-                SELECT a.*, v.marque, v.modele, v.image_url, v.prix_journalier
-                FROM avis a
-                JOIN vehicules v ON a.vehicule_id = v.id
-                WHERE a.client_id = ? and a.reservation_id = ?
-                ORDER BY a.date_creation DESC
-            ";
+            SELECT a.*,u.*, v.marque, v.modele, v.image_url, v.prix_journalier, v.immatriculation, v.categorie, v.note_moyenne, v.carburant
+            FROM avis a
+            JOIN utilisateurs u ON a.client_id = u.id
+            JOIN listevehicules v ON a.vehicule_id = v.id
+            WHERE 1=1
+        ";
+
+            $params = [];
+
+            if ($user_id !== null) {
+                $sql .= " AND a.client_id = ?";
+                $params[] = $user_id;
+            }
+            if ($reservation_id !== null) {
+                $sql .= " AND a.reservation_id = ?";
+                $params[] = $reservation_id;
+            }
 
             if ($limit !== null) {
                 $sql .= " LIMIT " . (int)$limit;
             }
 
             $stmt = self::$pdo->prepare($sql);
-            $stmt->execute([$user_id, $reservation_id]);
+            $stmt->execute($params);
+
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            error_log($e->getMessage());
+            return null;
+        }
+    }
+
+    public static function findByUser($user_id, $reservation_id = null, $limit = null)
+    {
+        self::initPDO();
+
+        try {
+            $sql = "
+            SELECT a.*, v.marque, v.modele, v.image_url, v.prix_journalier
+            FROM avis a
+            JOIN vehicules v ON a.vehicule_id = v.id
+            WHERE a.client_id = ?
+        ";
+
+            $params = [$user_id];
+
+            if ($reservation_id !== null) {
+                $sql .= " AND a.reservation_id = ?";
+                $params[] = $reservation_id;
+            }
+
+            if ($limit !== null) {
+                $sql .= " LIMIT " . (int)$limit;
+            }
+
+            $stmt = self::$pdo->prepare($sql);
+            $stmt->execute($params);
+
             return $stmt->fetch(PDO::FETCH_ASSOC);
         } catch (PDOException $e) {
-            error_log("Error in Review::findByUser(): " . $e->getMessage());
-            return [];
+            error_log($e->getMessage());
+            return null;
         }
     }
 
@@ -200,5 +191,12 @@ class Review
             error_log("Error in Review::getVehicleReviews(): " . $e->getMessage());
             return [];
         }
+    }
+
+    public static function deleteReview($id)
+    {
+        $sql = "delete from avis where id = ?";
+        $stmt = self::$pdo->prepare($sql);
+        $stmt->execute([$id]);
     }
 }
