@@ -1,139 +1,220 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestion Catégories - Admin MaBagnole</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>body { font-family: 'Poppins', sans-serif; }</style>
-</head>
-<body class="bg-gray-50">
+<?php
+session_start();
 
-    <div class="flex min-h-screen">
-        <aside class="w-64 bg-white shadow-sm hidden lg:flex flex-col sticky top-0 h-screen">
-            <div class="p-6 border-b text-center">
-                <span class="text-xl font-bold">Ma<span class="text-blue-600">Bagnole</span> Admin</span>
+if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] !== 'admin') {
+    header('Location: ../index.php');
+    exit();
+}
+include "../../classes/Categorie.php";
+
+$categories = Categorie::all();
+
+if (isset($_GET["id_active"])) {
+    Categorie::updateStatus(1, $_GET["id_active"]);
+    header("location: categories.php");
+}
+if (isset($_GET["id_desactive"])) {
+    Categorie::updateStatus(0, $_GET["id_desactive"]);
+    header("location: categories.php");
+}
+include "../header.php";
+
+
+?>
+
+<main class="main-content">
+    <div class="p-6 lg:p-8 pt-20 lg:pt-8">
+        <!-- Page Header -->
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+            <div>
+                <h1 class="text-2xl lg:text-3xl font-bold text-gray-800">Gestion des Catégories</h1>
+                <p class="text-sm text-gray-500 mt-1">Organisez et gérez les catégories de véhicules.</p>
             </div>
-            <nav class="flex-grow p-4 space-y-2 mt-4">
-                <a href="admin-dashboard.html" class="flex items-center gap-3 p-3 text-gray-600 hover:bg-gray-50 rounded-lg">
-                    <i class="fas fa-chart-pie w-5"></i> Dashboard
+            <div class="flex gap-3">
+                <button class="bg-white border border-gray-200 px-5 py-2.5 rounded-xl text-sm font-bold flex items-center gap-2 hover:bg-gray-50 transition shadow-sm">
+                    <i class="fas fa-download text-gray-600"></i> Exporter
+                </button>
+                <a href="categories-add.php" class="bg-blue-600 text-white px-5 py-2.5 rounded-xl text-sm font-bold flex items-center gap-2 hover:bg-blue-700 transition shadow-lg shadow-blue-200">
+                    <i class="fas fa-plus"></i> Nouvelle Catégorie
                 </a>
-                <a href="admin-fleet.html" class="flex items-center gap-3 p-3 text-gray-600 hover:bg-gray-50 rounded-lg">
-                    <i class="fas fa-car w-5"></i> Gestion Flotte
-                </a>
-                <a href="admin-categories.html" class="flex items-center gap-3 p-3 bg-blue-50 text-blue-600 rounded-lg font-bold">
-                    <i class="fas fa-tags w-5"></i> Catégories
-                </a>
-                <a href="admin-bookings.html" class="flex items-center gap-3 p-3 text-gray-600 hover:bg-gray-50 rounded-lg">
-                    <i class="fas fa-calendar-check w-5"></i> Réservations
-                </a>
-            </nav>
-        </aside>
+            </div>
+        </div>
 
-        <main class="flex-grow p-8">
-            <div class="mb-8">
-                <h1 class="text-2xl font-bold text-gray-800">Catégories de Véhicules</h1>
-                <p class="text-sm text-gray-500">Organisez votre flotte pour faciliter la recherche des clients.</p>
+        <!-- Stats Cards -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition">
+                <div class="flex items-center gap-4">
+                    <div class="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
+                        <i class="fas fa-tags text-blue-600 text-lg"></i>
+                    </div>
+                    <div>
+                        <p class="text-slate-500 text-sm">Total Catégories</p>
+                        <p class="text-2xl font-bold text-slate-900">24</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Search and Filter Bar -->
+        <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 mb-8">
+            <div class="flex flex-col lg:flex-row gap-4 items-center">
+                <div class="relative flex-grow">
+                    <input type="text"
+                        placeholder="Rechercher une catégorie..."
+                        class="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm outline-none focus:ring-2 focus:ring-blue-600 focus:border-blue-600">
+                    <i class="fas fa-search absolute left-3 top-3.5 text-gray-400"></i>
+                </div>
+
+                <select class="bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-blue-600">
+                    <option>Tous les statuts</option>
+                    <option>Actif</option>
+                    <option>Inactif</option>
+                    <option>En archive</option>
+                </select>
+
+                <select class="bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-blue-600">
+                    <option>Tous les types</option>
+                    <option>Voiture</option>
+                    <option>SUV</option>
+                    <option>Utilitaire</option>
+                    <option>Moto</option>
+                    <option>Camion</option>
+                </select>
+
+                <button class="text-sm text-blue-600 font-bold hover:bg-blue-50 px-4 py-3 rounded-xl transition flex items-center gap-2 whitespace-nowrap">
+                    <i class="fas fa-filter"></i>
+                    Filtres
+                </button>
+            </div>
+        </div>
+
+        <!-- Categories Table -->
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="w-full min-w-[900px]">
+                    <thead class="bg-gray-50">
+                        <tr class="text-gray-400 text-xs uppercase tracking-wider font-bold">
+                            <th class="px-6 py-4 text-left">Catégorie</th>
+                            <th class="px-6 py-4 text-left">Véhicules</th>
+                            <th class="px-6 py-4 text-left">Statut</th>
+                            <th class="px-6 py-4 text-right">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-100">
+                        <?php foreach ($categories as $categorie) { ?>
+                            <tr class="hover:bg-gray-50 transition">
+                                <td class="px-6 py-4">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-10 h-10 rounded-lg bg-gradient-to-r from-blue-500 to-blue-600 flex items-center justify-center">
+                                            <i class="fas fa-car text-white"></i>
+                                        </div>
+                                        <div>
+                                            <p class="font-bold text-gray-800"><?= $categorie["nom"] ?></p>
+                                        </div>
+                                    </div>
+                                </td>
+
+                                <td class="px-6 py-4">
+                                    <div class="space-y-1">
+                                        <p class="text-sm font-medium text-gray-800"><?= Categorie::countVehicle($categorie["nom"])["count"] ?></p>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <?php if ($categorie["disponible"] == 1) { ?>
+                                        <span class="inline-flex items-center gap-1 bg-green-100 text-green-700 text-xs font-bold px-3 py-1.5 rounded-full">
+                                            <i class="fas fa-check-circle text-xs"></i>
+                                            Actif
+                                        </span>
+                                    <?php } else { ?>
+                                        <span class="inline-flex items-center gap-1 bg-red-100 text-red-700 text-xs font-bold px-3 py-1.5 rounded-full">
+                                            <i class="fa-solid fa-xmark" style="color: #ff0000;"></i> Inactif
+                                        </span>
+                                    <?php } ?>
+
+                                </td>
+                                <td class="px-6 py-4">
+                                    <div class="flex justify-end gap-2">
+                                        <a href="categories-edit.php?id=<?= $categorie["id"] ?>" class="bg-blue-100 text-blue-600 p-2 rounded-lg hover:bg-blue-200 transition" title="Éditer">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <?php if ($categorie["disponible"] == 0) { ?>
+
+                                            <a href="categories.php?id_active=<?= $categorie["id"] ?>" class="bg-green-100 text-green-600 p-2 rounded-lg hover:bg-green-200 transition" title="Activeé">
+                                                <i class="fas fa-check-circle"></i>
+                                            </a>
+                                        <?php } else { ?>
+                                            <a href="categories.php?id_desactive=<?= $categorie["id"] ?>" class="bg-red-100 text-red-600 p-2 rounded-lg hover:bg-red-200 transition" title="Desactiveé">
+                                                <i class="fa-solid fa-xmark" style="color: #ff0000;"></i>
+                                            </a>
+                                        <?php } ?>
+                                    </div>
+                                </td>
+                            </tr>
+                        <?php } ?>
+                    </tbody>
+                </table>
             </div>
 
-            <div class="grid grid-cols-1 xl:grid-cols-3 gap-8">
-                
-                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 h-fit">
-                    <h2 class="font-bold text-gray-800 mb-6 flex items-center gap-2">
-                        <i class="fas fa-plus-circle text-blue-600"></i> Nouvelle Catégorie
-                    </h2>
-                    <form class="space-y-4">
-                        <div>
-                            <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Nom de la catégorie</label>
-                            <input type="text" placeholder="Ex: Électrique, Sportive..." class="w-full px-4 py-2.5 bg-gray-50 border rounded-lg outline-none focus:ring-2 focus:ring-blue-600 transition text-sm">
-                        </div>
-                        <div>
-                            <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Icône (FontAwesome)</label>
-                            <input type="text" placeholder="Ex: fas fa-bolt" class="w-full px-4 py-2.5 bg-gray-50 border rounded-lg outline-none focus:ring-2 focus:ring-blue-600 transition text-sm">
-                        </div>
-                        <div>
-                            <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Description courte</label>
-                            <textarea rows="3" class="w-full px-4 py-2.5 bg-gray-50 border rounded-lg outline-none focus:ring-2 focus:ring-blue-600 transition text-sm placeholder:text-gray-300" placeholder="Décrivez le type de véhicules..."></textarea>
-                        </div>
-                        <button class="w-full bg-blue-600 text-white font-bold py-3 rounded-xl shadow-lg shadow-blue-100 hover:bg-blue-700 transition">
-                            Créer la catégorie
+            <!-- Pagination -->
+            <div class="p-6 bg-gray-50 border-t border-gray-200">
+                <div class="flex flex-col sm:flex-row justify-between items-center gap-4">
+                    <p class="text-sm text-gray-500">
+                        Affichage <span class="font-bold text-gray-800">1-4</span> sur <span class="font-bold text-gray-800">24</span> catégories
+                    </p>
+                    <div class="flex gap-2">
+                        <button class="px-4 py-2 bg-white border border-gray-200 rounded-lg hover:bg-gray-100 transition shadow-sm flex items-center gap-2 text-sm">
+                            <i class="fas fa-chevron-left text-xs"></i>
+                            <span>Précédent</span>
                         </button>
-                    </form>
-                </div>
-
-                <div class="xl:col-span-2 bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-                    <table class="w-full text-left">
-                        <thead class="bg-gray-50 text-[10px] text-gray-400 uppercase font-bold tracking-wider">
-                            <tr>
-                                <th class="px-6 py-4">Icône & Nom</th>
-                                <th class="px-6 py-4">Description</th>
-                                <th class="px-6 py-4 text-center">Nb. Véhicules</th>
-                                <th class="px-6 py-4 text-right">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-gray-100 text-sm">
-                            <tr class="hover:bg-gray-50 transition">
-                                <td class="px-6 py-4">
-                                    <div class="flex items-center gap-3">
-                                        <div class="w-10 h-10 bg-yellow-100 text-yellow-600 rounded-lg flex items-center justify-center">
-                                            <i class="fas fa-bolt text-lg"></i>
-                                        </div>
-                                        <span class="font-bold text-gray-800">Électrique</span>
-                                    </div>
-                                </td>
-                                <td class="px-6 py-4 text-gray-500 text-xs">Véhicules 100% propres pour la ville et les longs trajets.</td>
-                                <td class="px-6 py-4 text-center font-bold">12</td>
-                                <td class="px-6 py-4 text-right">
-                                    <div class="flex justify-end gap-2">
-                                        <button class="p-2 text-gray-400 hover:text-blue-600 transition"><i class="fas fa-edit"></i></button>
-                                        <button class="p-2 text-gray-400 hover:text-red-600 transition"><i class="fas fa-trash"></i></button>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr class="hover:bg-gray-50 transition">
-                                <td class="px-6 py-4">
-                                    <div class="flex items-center gap-3">
-                                        <div class="w-10 h-10 bg-blue-100 text-blue-600 rounded-lg flex items-center justify-center">
-                                            <i class="fas fa-gem text-lg"></i>
-                                        </div>
-                                        <span class="font-bold text-gray-800">Luxe</span>
-                                    </div>
-                                </td>
-                                <td class="px-6 py-4 text-gray-500 text-xs">Berlines de prestige et voitures de sport haut de gamme.</td>
-                                <td class="px-6 py-4 text-center font-bold">8</td>
-                                <td class="px-6 py-4 text-right">
-                                    <div class="flex justify-end gap-2">
-                                        <button class="p-2 text-gray-400 hover:text-blue-600 transition"><i class="fas fa-edit"></i></button>
-                                        <button class="p-2 text-gray-400 hover:text-red-600 transition"><i class="fas fa-trash"></i></button>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr class="hover:bg-gray-50 transition">
-                                <td class="px-6 py-4">
-                                    <div class="flex items-center gap-3">
-                                        <div class="w-10 h-10 bg-green-100 text-green-600 rounded-lg flex items-center justify-center">
-                                            <i class="fas fa-truck-pickup text-lg"></i>
-                                        </div>
-                                        <span class="font-bold text-gray-800">Utilitaire</span>
-                                    </div>
-                                </td>
-                                <td class="px-6 py-4 text-gray-500 text-xs">Fourgonnettes et camions pour vos déménagements.</td>
-                                <td class="px-6 py-4 text-center font-bold">5</td>
-                                <td class="px-6 py-4 text-right">
-                                    <div class="flex justify-end gap-2">
-                                        <button class="p-2 text-gray-400 hover:text-blue-600 transition"><i class="fas fa-edit"></i></button>
-                                        <button class="p-2 text-gray-400 hover:text-red-600 transition"><i class="fas fa-trash"></i></button>
-                                    </div>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
+                        <button class="px-4 py-2 bg-blue-600 text-white border border-blue-600 rounded-lg hover:bg-blue-700 transition shadow-sm text-sm">
+                            1
+                        </button>
+                        <button class="px-4 py-2 bg-white border border-gray-200 rounded-lg hover:bg-gray-100 transition shadow-sm text-sm">
+                            2
+                        </button>
+                        <button class="px-4 py-2 bg-white border border-gray-200 rounded-lg hover:bg-gray-100 transition shadow-sm text-sm">
+                            3
+                        </button>
+                        <button class="px-4 py-2 bg-white border border-gray-200 rounded-lg hover:bg-gray-100 transition shadow-sm flex items-center gap-2 text-sm">
+                            <span>Suivant</span>
+                            <i class="fas fa-chevron-right text-xs"></i>
+                        </button>
+                    </div>
                 </div>
             </div>
-        </main>
+        </div>
     </div>
+</main>
+
+<script>
+    // Mobile sidebar toggle functionality
+    const mobileMenuToggle = document.getElementById('mobileMenuToggle');
+    const sidebar = document.querySelector('.sidebar');
+    const overlay = document.getElementById('overlay');
+
+    if (mobileMenuToggle && sidebar && overlay) {
+        mobileMenuToggle.addEventListener('click', function() {
+            sidebar.classList.toggle('active');
+            overlay.classList.toggle('hidden');
+        });
+
+        overlay.addEventListener('click', function() {
+            sidebar.classList.remove('active');
+            overlay.classList.add('hidden');
+        });
+
+        // Close sidebar when clicking on a link (mobile)
+        sidebar.querySelectorAll('a').forEach(link => {
+            link.addEventListener('click', function() {
+                if (window.innerWidth < 1024) {
+                    sidebar.classList.remove('active');
+                    overlay.classList.add('hidden');
+                }
+            });
+        });
+    }
+</script>
 
 </body>
+
 </html>
