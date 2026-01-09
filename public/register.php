@@ -1,15 +1,10 @@
 <?php
 include "../classes/Utilisateur.php";
-
-
-echo $_SERVER["PHP_SELF"];
-
-
 session_start();
 $field_errors = [];
 $success_message = null;
 $general_error = null;
-$validation_errors = [];
+$validation_errors = null;
 
 if (isset($_POST["register"])) {
     $nom = $_POST["nom"];
@@ -26,7 +21,6 @@ if (isset($_POST["register"])) {
         'telephone' => "/^(?:(?:\+|212|0)\s*[1-9](?:[\s.-]*\d{2}){4})$/",
         'mot_de_passe' => "/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/",
         'adresse' => "/^[a-zA-Z0-9À-ÿ\s\-\',.°]{5,100}$/u",
-        'ville' => "/^[a-zA-ZÀ-ÿ\s\-]{2,50}$/u",
         'permis_numero' => "/^[A-Z0-9]{12,15}$/"
     ];
 
@@ -36,7 +30,7 @@ if (isset($_POST["register"])) {
         if ($field === 'mot_de_passe') {
             if (!preg_match($pattern, $_POST[$field])) {
                 $validation_errors[$field] = true;
-                $field_errors[$field] = "Le mot de passe doit contenir au moins 8 caractères, une majuscule, une minuscule, un chiffre et un caractère spécial";
+                $field_errors[$field] = "Le mot de passe doit contenir au moins 8 caractères, une majuscule, une minuscule, un chiffre";
             }
         } elseif (isset($_POST[$field]) && !empty($_POST[$field])) {
             if (!preg_match($pattern, $_POST[$field])) {
@@ -64,11 +58,14 @@ if (isset($_POST["register"])) {
             }
         }
     }
+    if ($mot_de_passe !== $password_confirmation) {
+        $validation_errors['password_confirmation'] = true;
+        $field_errors['password_confirmation'] = "Les mots de passe ne correspondent pas";
+    }
 
-    if (empty($validation_errors)) {
-        $user = new Utilisateur($nom, $email, $mot_de_passe, "client", $telephone, $adresse, $permis_numero);
+    if ($validation_errors == null) {
+        $user = new Utilisateur(null, $nom, $email, $mot_de_passe, "client", $telephone, $adresse, $permis_numero);
         $resultat = $user->sInscrire();
-        echo "xi";
 
         if (!$resultat) {
             $general_error = "Email already exists!";
@@ -279,12 +276,12 @@ function display_field_error($field_name)
                                 <div class="relative">
                                     <input type="password" name="mot_de_passe" id="password" required
                                         class="w-full px-4 py-3 bg-gray-50 border <?php echo get_field_class('password'); ?> rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all">
-                                    <button type="button" onclick="togglePassword('password')" class="absolute right-4 top-3.5 text-gray-400">
+                                    <button type="button" onclick="togglePassword('mot_de_passe')" class="absolute right-4 top-3.5 text-gray-400">
                                         <i class="fas fa-eye"></i>
                                     </button>
 
                                 </div>
-                                <?php display_field_error('password'); ?>
+                                <?php display_field_error('mot_de_passe'); ?>
                             </div>
                             <div class="space-y-1">
                                 <label class="text-xs font-bold text-gray-400 uppercase">Confirmation</label>
