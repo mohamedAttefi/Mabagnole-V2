@@ -13,14 +13,12 @@ class ArticlesTag
         $this->tag_id = $tag_id;
         self::initPDO();
     }
-
     private static function initPDO()
     {
         if (self::$pdo === null) {
             self::$pdo = DataBase::getInstance()->getConnection();
         }
     }
-
     public function add()
     {
         self::initPDO();
