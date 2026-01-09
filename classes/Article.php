@@ -32,11 +32,17 @@ class Article
         }
     }
 
-    public static function all()
+    public static function all($statut = null)
     {
         self::initPDO();
-        $stmt = self::$pdo->prepare("SELECT *, b.id as article_id, u.nom as user_name,u.id as user_id, t.id as theme_id, t.name as theme_name from blog_articles b join themes t on b.theme_id = t.id join utilisateurs u on b.user_id = u.id");
-        $stmt->execute();
+        $sql = "SELECT *, b.id as article_id, u.nom as user_name,u.id as user_id, t.id as theme_id, t.name as theme_name from blog_articles b join themes t on b.theme_id = t.id join utilisateurs u on b.user_id = u.id where 1=1";
+        $params = [];
+        if($statut){
+            $sql .= " and status = ?";
+            $params[] = $statut;
+        }
+        $stmt = self::$pdo->prepare($sql);
+        $stmt->execute($params);
         return $stmt->fetchall(PDO::FETCH_ASSOC);
     }
 
