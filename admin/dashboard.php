@@ -1,175 +1,243 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard - MaBagnole</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        body { font-family: 'Poppins', sans-serif; }
-        .sidebar-active { border-right: 4px solid #2563eb; background: #eff6ff; color: #2563eb; }
-    </style>
-</head>
-<body class="bg-gray-100">
+<?php
+session_start();
+include "header.php";
+include "../classes/Admin.php";
+include "../classes/Client.php";
+include "../classes/Reservation.php";
+include "../classes/Vehicle.php";
+if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] !== 'admin') {
+    header('Location: ../public/login.php');
+    exit();
+}
+$admin = Admin::findByEmail($_SESSION["user_email"]);
+$vehicles = Vehicle::all();
+$vehicles_disponible = Vehicle::all(1);
+$reservations = Reservation::getAll();
+echo count($reservations);
+$reservations_en_attente = Reservation::getAll(null, null, "en_attente");
+$clients = Client::getAll();
+$prix_total = 0;
+foreach ($reservations as $reservation) {
+    $prix_total += (int)$reservation["prix_total"];
+    $reservation["prix_total"];
+}
 
-    <div class="flex min-h-screen">
-        <aside class="w-64 bg-white shadow-xl hidden lg:flex flex-col sticky top-0 h-screen">
-            <div class="p-6 border-b">
-                <a href="index.html" class="flex items-center gap-2">
-                    <i class="fas fa-car-side text-blue-600 text-2xl"></i>
-                    <span class="text-xl font-bold">Ma<span class="text-blue-600">Bagnole</span></span>
-                </a>
+?>
+
+
+
+<!-- Main Content -->
+<main class="main-content">
+    <div class="p-6 lg:p-8 pt-20 lg:pt-8">
+        <!-- Header -->
+        <div class="flex flex-col lg:flex-row justify-between items-start lg:items-end gap-6 mb-8">
+            <div>
+                <h1 class="text-2xl lg:text-3xl font-bold text-gray-800">Bonjour, <?= $admin->__get("nom") ?> 👋</h1>
+                <p class="text-gray-500 mt-1">Voici ce qu'il se passe sur votre plateforme aujourd'hui.</p>
             </div>
-            
-            <nav class="flex-grow p-4 space-y-2 mt-4">
-                <a href="admin-dashboard.html" class="flex items-center gap-3 p-3 rounded-lg sidebar-active font-bold">
-                    <i class="fas fa-chart-pie w-5"></i> Dashboard
-                </a>
-                <a href="admin-fleet.html" class="flex items-center gap-3 p-3 text-gray-600 hover:bg-gray-50 rounded-lg transition">
-                    <i class="fas fa-car w-5"></i> Gestion Flotte
-                </a>
-                <a href="admin-bookings.html" class="flex items-center gap-3 p-3 text-gray-600 hover:bg-gray-50 rounded-lg transition">
-                    <i class="fas fa-calendar-check w-5"></i> Réservations
-                </a>
-                <a href="admin-users.html" class="flex items-center gap-3 p-3 text-gray-600 hover:bg-gray-50 rounded-lg transition">
-                    <i class="fas fa-users w-5"></i> Utilisateurs
-                </a>
-                <a href="admin-blog.html" class="flex items-center gap-3 p-3 text-gray-600 hover:bg-gray-50 rounded-lg transition">
-                    <i class="fas fa-newspaper w-5"></i> Modération Blog
-                </a>
-            </nav>
+            <div class="flex gap-3 w-full lg:w-auto">
+                <button class="flex-1 lg:flex-none bg-white px-4 py-2.5 rounded-xl border border-gray-200 text-sm font-bold hover:bg-gray-50 transition shadow-sm">
+                    <i class="fas fa-file-pdf mr-2 text-red-500"></i>Rapport PDF
+                </button>
+                <button class="flex-1 lg:flex-none bg-blue-600 text-white px-4 py-2.5 rounded-xl text-sm font-bold hover:bg-blue-700 transition shadow-lg shadow-blue-200">
+                    <i class="fas fa-plus mr-2"></i>Ajouter Véhicule
+                </button>
+            </div>
+        </div>
 
-            <div class="p-4 border-t">
-                <div class="flex items-center gap-3 p-2 bg-gray-50 rounded-lg mb-4">
-                    <div class="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold">A</div>
-                    <div>
-                        <p class="text-sm font-bold">Admin</p>
-                        <p class="text-[10px] text-gray-500 uppercase">Super Utilisateur</p>
+        <!-- Stats Cards -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+            <div class="stat-card bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                <div class="flex justify-between items-start mb-4">
+                    <div class="p-3 bg-blue-100 text-blue-600 rounded-xl">
+                        <i class="fas fa-euro-sign"></i>
                     </div>
+                    <span class="text-green-500 text-xs font-bold">+12% <i class="fas fa-arrow-up ml-1"></i></span>
                 </div>
-                <a href="index.html" class="flex items-center gap-3 p-3 text-red-500 hover:bg-red-50 rounded-lg transition text-sm font-bold">
-                    <i class="fas fa-power-off"></i> Quitter l'Admin
-                </a>
-            </div>
-        </aside>
-
-        <main class="flex-grow p-8">
-            <div class="lg:hidden flex justify-between items-center mb-8">
-                <i class="fas fa-car-side text-blue-600 text-2xl"></i>
-                <button class="p-2 bg-white rounded-lg shadow"><i class="fas fa-bars"></i></button>
+                <p class="text-sm text-gray-500 font-medium">Revenus mensuels</p>
+                <p class="text-2xl font-bold text-gray-800 mt-1"><?= $prix_total ?> €</p>
             </div>
 
-            <div class="flex justify-between items-end mb-8">
-                <div>
-                    <h1 class="text-2xl font-bold text-gray-800">Bonjour, Admin 👋</h1>
-                    <p class="text-gray-500">Voici ce qu'il se passe sur votre plateforme aujourd'hui.</p>
+            <div class="stat-card bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                <div class="flex justify-between items-start mb-4">
+                    <div class="p-3 bg-orange-100 text-orange-600 rounded-xl">
+                        <i class="fas fa-calendar-alt"></i>
+                    </div>
+                    <span class="text-orange-500 text-xs font-bold"><?= count($reservations_en_attente) ?> En attente</span>
                 </div>
-                <div class="flex gap-3">
-                    <button class="bg-white px-4 py-2 rounded-lg border text-sm font-bold hover:bg-gray-50 transition">Rapport PDF</button>
-                    <button class="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-blue-700 transition shadow-lg shadow-blue-200">+ Ajouter Véhicule</button>
-                </div>
+                <p class="text-sm text-gray-500 font-medium">Réservations</p>
+                <p class="text-2xl font-bold text-gray-800 mt-1"><?= count($reservations) ?></p>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
-                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-                    <div class="flex justify-between items-start mb-4">
-                        <div class="p-3 bg-blue-100 text-blue-600 rounded-xl"><i class="fas fa-euro-sign"></i></div>
-                        <span class="text-green-500 text-xs font-bold">+12% <i class="fas fa-arrow-up"></i></span>
+            <div class="stat-card bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                <div class="flex justify-between items-start mb-4">
+                    <div class="p-3 bg-green-100 text-green-600 rounded-xl">
+                        <i class="fas fa-car"></i>
                     </div>
-                    <p class="text-sm text-gray-500 font-medium">Revenus mensuels</p>
-                    <p class="text-2xl font-bold text-gray-800">12 840 €</p>
+                    <span class="text-gray-400 text-xs font-bold">85% Occ.</span>
                 </div>
-                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-                    <div class="flex justify-between items-start mb-4">
-                        <div class="p-3 bg-orange-100 text-orange-600 rounded-xl"><i class="fas fa-calendar-alt"></i></div>
-                        <span class="text-orange-500 text-xs font-bold">8 En attente</span>
-                    </div>
-                    <p class="text-sm text-gray-500 font-medium">Réservations</p>
-                    <p class="text-2xl font-bold text-gray-800">142</p>
-                </div>
-                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-                    <div class="flex justify-between items-start mb-4">
-                        <div class="p-3 bg-green-100 text-green-600 rounded-xl"><i class="fas fa-car"></i></div>
-                        <span class="text-gray-400 text-xs font-bold">85% Occ.</span>
-                    </div>
-                    <p class="text-sm text-gray-500 font-medium">Véhicules Actifs</p>
-                    <p class="text-2xl font-bold text-gray-800">48 / 56</p>
-                </div>
-                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-                    <div class="flex justify-between items-start mb-4">
-                        <div class="p-3 bg-purple-100 text-purple-600 rounded-xl"><i class="fas fa-user-plus"></i></div>
-                        <span class="text-green-500 text-xs font-bold">+52</span>
-                    </div>
-                    <p class="text-sm text-gray-500 font-medium">Nouveaux Clients</p>
-                    <p class="text-2xl font-bold text-gray-800">1 204</p>
-                </div>
+                <p class="text-sm text-gray-500 font-medium">Véhicules Actifs</p>
+                <p class="text-2xl font-bold text-gray-800 mt-1"><?= count($vehicles) ?> / <?= count($vehicles_disponible) ?></p>
             </div>
 
-            <div class="grid grid-cols-1 xl:grid-cols-3 gap-8">
-                <div class="xl:col-span-2 bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-                    <div class="flex justify-between items-center mb-6">
-                        <h2 class="font-bold text-gray-800 uppercase text-sm tracking-wider">Réservations Récentes</h2>
-                        <a href="#" class="text-blue-600 text-xs font-bold hover:underline">Voir tout</a>
+            <div class="stat-card bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                <div class="flex justify-between items-start mb-4">
+                    <div class="p-3 bg-purple-100 text-purple-600 rounded-xl">
+                        <i class="fas fa-user-plus"></i>
                     </div>
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-left">
-                            <thead>
-                                <tr class="text-gray-400 text-[10px] uppercase border-b">
-                                    <th class="pb-4 font-bold">Client</th>
-                                    <th class="pb-4 font-bold">Véhicule</th>
-                                    <th class="pb-4 font-bold">Date</th>
-                                    <th class="pb-4 font-bold">Status</th>
-                                    <th class="pb-4 font-bold text-right">Montant</th>
-                                </tr>
-                            </thead>
-                            <tbody class="text-sm">
-                                <tr class="border-b last:border-0">
-                                    <td class="py-4 font-medium">Jean Dupont</td>
-                                    <td class="py-4 text-gray-500 text-xs">Tesla Model 3</td>
-                                    <td class="py-4 text-gray-500 text-xs">Aujourd'hui</td>
+                    <span class="text-green-500 text-xs font-bold">+52</span>
+                </div>
+                <p class="text-sm text-gray-500 font-medium">Nouveaux Clients</p>
+                <p class="text-2xl font-bold text-gray-800 mt-1"><?= count($clients) ?></p>
+            </div>
+        </div>
+
+        <!-- Main Content Grid -->
+        <div class="grid grid-cols-1 xl:grid-cols-3 gap-8">
+            <!-- Recent Reservations -->
+            <div class="xl:col-span-2 bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+                    <h2 class="font-bold text-gray-800 uppercase text-sm tracking-wider">Réservations Récentes</h2>
+                    <a href="reservations.php" class="text-blue-600 text-xs font-bold hover:underline flex items-center gap-1">
+                        Voir tout <i class="fas fa-arrow-right ml-1 text-xs"></i>
+                    </a>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full min-w-[600px]">
+                        <thead>
+                            <tr class="text-gray-400 text-xs uppercase border-b">
+                                <th class="pb-4 font-bold text-left">Client</th>
+                                <th class="pb-4 font-bold text-left">Véhicule</th>
+                                <th class="pb-4 font-bold text-left">Date</th>
+                                <th class="pb-4 font-bold text-left">Status</th>
+                                <th class="pb-4 font-bold text-right">Montant</th>
+                            </tr>
+                        </thead>
+                        <tbody class="text-sm">
+                            <?php foreach ($reservations as $reservation) { ?>
+                                <tr class="border-b table-row hover:bg-slate-50 transition">
+                                    <td class="py-4 font-medium"><?= $reservation["nom"] ?></td>
+                                    <td class="py-4 text-gray-500"><?= $reservation["marque"] . " " . $reservation["modele"] ?></td>
+                                    <td class="py-4 text-gray-500"><?= $reservation["date_debut"] ?></td>
                                     <td class="py-4">
-                                        <span class="bg-green-100 text-green-600 px-2 py-1 rounded text-[10px] font-bold">CONFIRMÉ</span>
+                                        <span class=" <?= $reservation["statut"] == "annulee" ? "bg-red-100 text-red-600" : ($reservation["statut"] == "confirmee" ? "bg-green-100 text-green-600" : "bg-blue-100 text-blue-600") ?> px-3 py-1.5 rounded-lg text-xs font-bold"><?= $reservation["statut"] == "confirmee" ? "CONFIRMEE" : "EN_ATTENTE" ?></span>
                                     </td>
-                                    <td class="py-4 text-right font-bold">245 €</td>
+                                    <td class="py-4 text-right font-bold"><?= $reservation["prix_total"] ?> €</td>
                                 </tr>
-                                <tr class="border-b last:border-0">
-                                    <td class="py-4 font-medium">Sophie Martin</td>
-                                    <td class="py-4 text-gray-500 text-xs">Audi A3</td>
-                                    <td class="py-4 text-gray-500 text-xs">Demain</td>
-                                    <td class="py-4">
-                                        <span class="bg-yellow-100 text-yellow-600 px-2 py-1 rounded text-[10px] font-bold">ATTENTE</span>
-                                    </td>
-                                    <td class="py-4 text-right font-bold">120 €</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
+                            <?php } ?>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Fleet Alerts -->
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="font-bold text-gray-800 uppercase text-sm tracking-wider">Alertes Flotte</h2>
+                    <span class="bg-red-100 text-red-600 text-xs font-bold px-2 py-1 rounded-full">3</span>
                 </div>
 
-                <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-                    <h2 class="font-bold text-gray-800 uppercase text-sm tracking-wider mb-6">Alertes Flotte</h2>
-                    <div class="space-y-6">
+                <div class="space-y-4">
+                    <div class="alert-card alert-red p-4 rounded-xl">
                         <div class="flex items-center gap-4">
-                            <div class="w-10 h-10 bg-red-100 text-red-600 rounded-full flex items-center justify-center"><i class="fas fa-tools"></i></div>
-                            <div>
-                                <p class="text-sm font-bold">Révision Nécessaire</p>
-                                <p class="text-[10px] text-gray-400">Porsche 911 • #MB-221</p>
+                            <div class="w-10 h-10 bg-red-100 text-red-600 rounded-full flex items-center justify-center">
+                                <i class="fas fa-tools"></i>
                             </div>
-                        </div>
-                        <div class="flex items-center gap-4">
-                            <div class="w-10 h-10 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center"><i class="fas fa-info-circle"></i></div>
-                            <div>
-                                <p class="text-sm font-bold">Assurance Expirée</p>
-                                <p class="text-[10px] text-gray-400">Renault Zoe • #MB-004</p>
+                            <div class="flex-grow">
+                                <p class="text-sm font-bold text-gray-800">Révision Nécessaire</p>
+                                <p class="text-xs text-gray-500">Porsche 911 • #MB-221</p>
                             </div>
+                            <span class="text-red-500 text-xs font-bold">URGENT</span>
                         </div>
                     </div>
+
+                    <div class="alert-card alert-blue p-4 rounded-xl">
+                        <div class="flex items-center gap-4">
+                            <div class="w-10 h-10 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center">
+                                <i class="fas fa-info-circle"></i>
+                            </div>
+                            <div class="flex-grow">
+                                <p class="text-sm font-bold text-gray-800">Assurance Expirée</p>
+                                <p class="text-xs text-gray-500">Renault Zoe • #MB-004</p>
+                            </div>
+                            <span class="text-blue-500 text-xs font-bold">DANS 7J</span>
+                        </div>
+                    </div>
+
+                    <div class="alert-card bg-amber-50 p-4 rounded-xl">
+                        <div class="flex items-center gap-4">
+                            <div class="w-10 h-10 bg-amber-100 text-amber-600 rounded-full flex items-center justify-center">
+                                <i class="fas fa-exclamation-triangle"></i>
+                            </div>
+                            <div class="flex-grow">
+                                <p class="text-sm font-bold text-gray-800">Contrôle Technique</p>
+                                <p class="text-xs text-gray-500">Peugeot 308 • #MB-112</p>
+                            </div>
+                            <span class="text-amber-500 text-xs font-bold">DANS 30J</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-8 pt-6 border-t border-gray-100">
+                    <a href="#" class="text-blue-600 text-sm font-medium hover:underline flex items-center gap-2">
+                        <i class="fas fa-history"></i>
+                        Voir toutes les alertes
+                    </a>
                 </div>
             </div>
-        </main>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="mt-8 grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="bg-gradient-to-r from-blue-500 to-blue-600 text-white p-6 rounded-2xl">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="p-3 bg-white/20 rounded-xl">
+                        <i class="fas fa-car text-xl"></i>
+                    </div>
+                    <span class="text-white/80 text-xs font-bold">56 Véhicules</span>
+                </div>
+                <h3 class="text-lg font-bold mb-2">Gestion Flotte</h3>
+                <p class="text-blue-100 text-sm mb-4">Ajoutez, modifiez ou gérez votre parc automobile</p>
+                <a href="vehicles.php" class="inline-flex items-center gap-2 bg-white text-blue-600 px-4 py-2 rounded-lg font-bold text-sm hover:bg-blue-50 transition">
+                    <i class="fas fa-arrow-right"></i>
+                    Accéder
+                </a>
+            </div>
+
+            <div class="bg-gradient-to-r from-purple-500 to-purple-600 text-white p-6 rounded-2xl">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="p-3 bg-white/20 rounded-xl">
+                        <i class="fas fa-users text-xl"></i>
+                    </div>
+                    <span class="text-white/80 text-xs font-bold">1 204 Clients</span>
+                </div>
+                <h3 class="text-lg font-bold mb-2">Gestion Clients</h3>
+                <p class="text-purple-100 text-sm mb-4">Consultez et gérez les profils de vos clients</p>
+                <a href="users.php" class="inline-flex items-center gap-2 bg-white text-purple-600 px-4 py-2 rounded-lg font-bold text-sm hover:bg-purple-50 transition">
+                    <i class="fas fa-arrow-right"></i>
+                    Accéder
+                </a>
+            </div>
+
+            <div class="bg-gradient-to-r from-green-500 to-green-600 text-white p-6 rounded-2xl">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="p-3 bg-white/20 rounded-xl">
+                        <i class="fas fa-chart-line text-xl"></i>
+                    </div>
+                    <span class="text-white/80 text-xs font-bold">Analytique</span>
+                </div>
+                <h3 class="text-lg font-bold mb-2">Rapports & Stats</h3>
+                <p class="text-green-100 text-sm mb-4">Analysez les performances de votre entreprise</p>
+                <a href="#" class="inline-flex items-center gap-2 bg-white text-green-600 px-4 py-2 rounded-lg font-bold text-sm hover:bg-green-50 transition">
+                    <i class="fas fa-arrow-right"></i>
+                    Générer
+                </a>
+            </div>
+        </div>
     </div>
+</main>
 
 </body>
+
 </html>
