@@ -1,166 +1,294 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestion Blog - Admin MaBagnole</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>body { font-family: 'Poppins', sans-serif; }</style>
-</head>
-<body class="bg-gray-50">
+<?php
+session_start();
+if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] !== 'admin') {
+    header('Location: ../index.php');
+    exit();
+}
+include "../../classes/Article.php";
+include "../header.php";
+$articles = Article::all();
+$articles_publie = Article::all("approved");
+$articles_enAttente = Article::all("pending");
 
-    <div class="flex min-h-screen">
-        <aside class="w-64 bg-white shadow-sm hidden lg:flex flex-col sticky top-0 h-screen">
-            <div class="p-6 border-b text-center">
-                <span class="text-xl font-bold">Ma<span class="text-blue-600">Bagnole</span> Admin</span>
+
+if(isset($_GET["id_reject"])){
+    
+}
+if(isset($_GET["id_approuve"])){
+    
+}
+
+?>
+
+<main class="main-content">
+    <div class="p-6 lg:p-8 pt-20 lg:pt-8">
+        <!-- Page Header -->
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+            <div>
+                <h1 class="text-2xl lg:text-3xl font-bold text-gray-800">Gestion des Articles</h1>
+                <p class="text-sm text-gray-500 mt-1">Créez et gérez le contenu du blog automobile.</p>
             </div>
-            <nav class="flex-grow p-4 space-y-2 mt-4">
-                <a href="admin-dashboard.html" class="flex items-center gap-3 p-3 text-gray-600 hover:bg-gray-50 rounded-lg">
-                    <i class="fas fa-chart-pie w-5"></i> Dashboard
-                </a>
-                <a href="admin-fleet.html" class="flex items-center gap-3 p-3 text-gray-600 hover:bg-gray-50 rounded-lg">
-                    <i class="fas fa-car w-5"></i> Gestion Flotte
-                </a>
-                <a href="admin-blog.html" class="flex items-center gap-3 p-3 bg-blue-50 text-blue-600 rounded-lg font-bold">
-                    <i class="fas fa-newspaper w-5"></i> Gestion Blog
-                </a>
-                <a href="admin-users.html" class="flex items-center gap-3 p-3 text-gray-600 hover:bg-gray-50 rounded-lg">
-                    <i class="fas fa-users w-5"></i> Utilisateurs
-                </a>
-            </nav>
-        </aside>
-
-        <main class="flex-grow p-8">
-            <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
-                <div>
-                    <h1 class="text-2xl font-bold text-gray-800">Gestion du Blog</h1>
-                    <p class="text-sm text-gray-500">Gérez les publications, validez les articles et modérez les commentaires.</p>
-                </div>
-                <a href="write-article.html" class="bg-blue-600 text-white px-6 py-3 rounded-xl font-bold shadow-lg shadow-blue-200 hover:bg-blue-700 transition flex items-center gap-2">
-                    <i class="fas fa-pen-nib"></i> Nouvel Article
-                </a>
+            <div class="flex gap-3">
+                <button class="bg-white border border-gray-200 px-5 py-2.5 rounded-xl text-sm font-bold flex items-center gap-2 hover:bg-gray-50 transition shadow-sm">
+                    <i class="fas fa-download text-gray-600"></i> Exporter
+                </button>
+                <button class="bg-blue-600 text-white px-5 py-2.5 rounded-xl text-sm font-bold flex items-center gap-2 hover:bg-blue-700 transition shadow-lg shadow-blue-200">
+                    <i class="fas fa-plus"></i> Nouvel Article
+                </button>
             </div>
+        </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-4">
-                    <div class="w-12 h-12 bg-blue-100 text-blue-600 rounded-xl flex items-center justify-center text-xl">
-                        <i class="fas fa-file-alt"></i>
+        <!-- Stats Cards -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition">
+                <div class="flex items-center gap-4">
+                    <div class="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
+                        <i class="fas fa-newspaper text-blue-600 text-lg"></i>
                     </div>
                     <div>
-                        <span class="block text-2xl font-bold">24</span>
-                        <span class="text-xs text-gray-500 font-bold uppercase">Articles publiés</span>
-                    </div>
-                </div>
-                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-4">
-                    <div class="w-12 h-12 bg-yellow-100 text-yellow-600 rounded-xl flex items-center justify-center text-xl">
-                        <i class="fas fa-clock"></i>
-                    </div>
-                    <div>
-                        <span class="block text-2xl font-bold">03</span>
-                        <span class="text-xs text-gray-500 font-bold uppercase">En attente</span>
-                    </div>
-                </div>
-                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-4">
-                    <div class="w-12 h-12 bg-green-100 text-green-600 rounded-xl flex items-center justify-center text-xl">
-                        <i class="fas fa-eye"></i>
-                    </div>
-                    <div>
-                        <span class="block text-2xl font-bold">12.5k</span>
-                        <span class="text-xs text-gray-500 font-bold uppercase">Vues totales</span>
+                        <p class="text-slate-500 text-sm">Total Articles</p>
+                        <p class="text-2xl font-bold text-slate-900"><?= count($articles) ?></p>
                     </div>
                 </div>
             </div>
 
-            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-                <div class="p-6 border-b flex justify-between items-center">
-                    <h2 class="font-bold text-gray-800">Dernières Publications</h2>
-                    <div class="flex gap-2">
-                        <button class="text-xs font-bold text-gray-400 hover:text-blue-600">Tous</button>
-                        <span class="text-gray-300">|</span>
-                        <button class="text-xs font-bold text-gray-400 hover:text-blue-600">Brouillons</button>
+            <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition">
+                <div class="flex items-center gap-4">
+                    <div class="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center">
+                        <i class="fas fa-eye text-green-600 text-lg"></i>
+                    </div>
+                    <div>
+                        <p class="text-slate-500 text-sm">Articles Publiés</p>
+                        <p class="text-2xl font-bold text-slate-900"><?= count($articles_publie) ?></p>
                     </div>
                 </div>
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left">
-                        <thead class="bg-gray-50 text-[10px] text-gray-400 uppercase font-bold tracking-wider">
-                            <tr>
-                                <th class="px-6 py-4">Article</th>
-                                <th class="px-6 py-4">Auteur</th>
-                                <th class="px-6 py-4">Catégorie</th>
-                                <th class="px-6 py-4 text-center">Engagement</th>
-                                <th class="px-6 py-4">Statut</th>
-                                <th class="px-6 py-4 text-right">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-gray-100 text-sm">
+            </div>
+
+            <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition">
+                <div class="flex items-center gap-4">
+                    <div class="w-12 h-12 bg-yellow-100 rounded-xl flex items-center justify-center">
+                        <i class="fas fa-clock text-yellow-600 text-lg"></i>
+                    </div>
+                    <div>
+                        <p class="text-slate-500 text-sm">En attente</p>
+                        <p class="text-2xl font-bold text-slate-900"><?= count($articles_enAttente) ?></p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition">
+                <div class="flex items-center gap-4">
+                    <div class="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center">
+                        <i class="fas fa-chart-line text-purple-600 text-lg"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Search and Filter Bar -->
+        <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 mb-8">
+            <div class="flex flex-col lg:flex-row gap-4 items-center">
+                <div class="relative flex-grow">
+                    <input type="text"
+                        placeholder="Rechercher un article par titre ou auteur..."
+                        class="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm outline-none focus:ring-2 focus:ring-blue-600 focus:border-blue-600">
+                    <i class="fas fa-search absolute left-3 top-3.5 text-gray-400"></i>
+                </div>
+
+                <select class="bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-blue-600">
+                    <option>Tous les statuts</option>
+                    <option>Publié</option>
+                    <option>Brouillon</option>
+                    <option>En attente</option>
+                    <option>Archivé</option>
+                </select>
+
+                <select class="bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-blue-600">
+                    <option>Toutes les catégories</option>
+                    <option>Actualités</option>
+                    <option>Tests</option>
+                    <option>Conseils</option>
+                    <option>Électrique</option>
+                </select>
+
+                <button class="text-sm text-blue-600 font-bold hover:bg-blue-50 px-4 py-3 rounded-xl transition flex items-center gap-2 whitespace-nowrap">
+                    <i class="fas fa-filter"></i>
+                    Filtres avancés
+                </button>
+            </div>
+        </div>
+
+        <!-- Articles Table -->
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="w-full min-w-[1000px]">
+                    <thead class="bg-gray-50">
+                        <tr class="text-gray-400 text-xs uppercase tracking-wider font-bold">
+                            <th class="px-6 py-4 text-left">Article</th>
+                            <th class="px-6 py-4 text-left">Auteur</th>
+                            <th class="px-6 py-4 text-left">Catégorie</th>
+                            <th class="px-6 py-4 text-left">Date</th>
+                            <th class="px-6 py-4 text-left">Statut</th>
+                            <th class="px-6 py-4 text-right">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-100">
+                        <!-- Published Article -->
+                        <?php foreach ($articles as $article) { ?>
                             <tr class="hover:bg-gray-50 transition">
-                                <td class="px-6 py-4 max-w-xs">
-                                    <div class="flex items-center gap-3">
-                                        <img src="https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&q=80&w=100" class="w-12 h-10 object-cover rounded shadow-sm">
-                                        <div>
-                                            <p class="font-bold text-gray-800 truncate">Top 10 des plus belles routes de France</p>
-                                            <p class="text-[10px] text-gray-400">Publié le 02/01/2024</p>
+                                <td class="px-6 py-4">
+                                    <div class="flex items-start gap-3">
+                                        <div class="">
+                                            <p class="font-bold text-gray-800 line-clamp-2">
+                                                <?= $article["title"] ?>
+                                            </p>
+                                            <p class="text-xs text-gray-500 line-clamp-2">
+                                                "<?= $article["content"] ?>"
+                                            </p>
                                         </div>
                                     </div>
                                 </td>
-                                <td class="px-6 py-4 text-gray-600">Admin</td>
                                 <td class="px-6 py-4">
-                                    <span class="bg-blue-50 text-blue-600 px-2 py-1 rounded text-[10px] font-bold">VOYAGE</span>
+                                    <div class="flex items-center">
+                                        <span class="text-sm text-gray-700"><?= $article["user_name"] ?></span>
+                                    </div>
                                 </td>
                                 <td class="px-6 py-4 text-center">
-                                    <div class="flex justify-center gap-3 text-gray-400 text-xs">
-                                        <span><i class="fas fa-eye"></i> 1.2k</span>
-                                        <span><i class="fas fa-comment"></i> 14</span>
-                                    </div>
-                                </td>
-                                <td class="px-6 py-4">
-                                    <span class="text-green-500 font-bold text-[10px] flex items-center gap-1">
-                                        <span class="w-1.5 h-1.5 bg-green-500 rounded-full"></span> EN LIGNE
+                                    <span class="inline-flex items-center gap-1 bg-blue-50 text-blue-700 text-xs font-medium px-3 py-1.5 rounded-full">
+                                        <?= $article["theme_name"] ?>
                                     </span>
                                 </td>
-                                <td class="px-6 py-4 text-right">
-                                    <div class="flex justify-end gap-2">
-                                        <button class="p-2 text-gray-400 hover:text-blue-600 transition"><i class="fas fa-edit"></i></button>
-                                        <button class="p-2 text-gray-400 hover:text-red-600 transition"><i class="fas fa-trash"></i></button>
+                                <td class="">
+                                    <div class="">
+                                        <p class="text-sm text-gray-800"><?= (new DateTime($article["created_at"]))->format("Y/m/d") ?></p>
+                                        <?php
+                                        $date_creation = new DateTime($article["created_at"]);
+                                        $now = new DateTime();
+                                        $interval = $date_creation->diff($now);
+                                        $duree = "";
+                                        if ($interval->m > 0) {
+                                            $duree = "il ya " . $interval->m . " mois";
+                                        } elseif ($interval->d > 0) {
+                                            $duree = "il ya " . $interval->d . " jours";
+                                        } elseif ($interval->h > 0) {
+                                            $duree = "il ya " . $interval->h . " heures";
+                                        } elseif ($interval->i > 0) {
+                                            $duree = "il ya " . $interval->i . " minutes";
+                                        } elseif ($interval->s > 0) {
+                                            $duree = "il ya " . $interval->s . " secondes";
+                                        } else {
+                                            $duree = "just now";
+                                        }
+                                        ?>
+                                        <p class="text-xs text-gray-500">Publié <?= $duree ?> </p>
                                     </div>
                                 </td>
-                            </tr>
+                                <td class="px-6 py-4">
+                                    <?php if ($article["status"] == "approved") { ?>
+                                        <span class="inline-flex items-center gap-1 bg-green-100 text-green-700 text-xs font-bold px-3 py-1.5 rounded-full">
+                                            Publié</span>
+                                    <?php } elseif ($article["status"] == "pending") { ?>
+                                        <span class="inline-flex text-center items-center gap-1 bg-blue-100 text-blue-700 text-xs font-bold px-3 py-1.5 rounded-full">
+                                            En attente</span>
+                                    <?php } else { ?>
+                                        <span class="inline-flex items-center gap-1 bg-red-100 text-red-700 text-xs font-bold px-3 py-1.5 rounded-full">
+                                            Rejected</span>
+                                    <?php } ?>
 
-                            <tr class="hover:bg-gray-50 transition bg-yellow-50/20">
-                                <td class="px-6 py-4 max-w-xs">
-                                    <div class="flex items-center gap-3">
-                                        <div class="w-12 h-10 bg-gray-200 rounded flex items-center justify-center">
-                                            <i class="fas fa-image text-gray-400"></i>
-                                        </div>
-                                        <div>
-                                            <p class="font-bold text-gray-800 truncate">Pourquoi passer à l'électrique en 2024 ?</p>
-                                            <p class="text-[10px] text-gray-400">Par Jean Dupont</p>
-                                        </div>
-                                    </div>
                                 </td>
-                                <td class="px-6 py-4 text-gray-600">J. Dupont</td>
                                 <td class="px-6 py-4">
-                                    <span class="bg-gray-100 text-gray-600 px-2 py-1 rounded text-[10px] font-bold">CONSEILS</span>
-                                </td>
-                                <td class="px-6 py-4 text-center text-gray-400 italic">--</td>
-                                <td class="px-6 py-4">
-                                    <span class="bg-yellow-100 text-yellow-700 px-2 py-1 rounded text-[10px] font-bold">ATTENTE</span>
-                                </td>
-                                <td class="px-6 py-4 text-right">
                                     <div class="flex justify-end gap-2">
-                                        <button class="bg-green-600 text-white px-3 py-1 rounded text-[10px] font-bold hover:bg-green-700 transition">Publier</button>
-                                        <button class="p-2 text-gray-400 hover:text-red-600 transition"><i class="fas fa-trash"></i></button>
+                                        <button class="bg-blue-100 text-blue-600 p-2 rounded-lg hover:bg-blue-200 transition" title="Voir">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                     
+                                        <?php if ($article["status"] == "approved") { ?>
+                                            <a href="blogs.php?id_reject=<?= $article["id"] ?>" class="bg-red-100 text-red-600 p-2 rounded-lg hover:bg-red-200 transition" title="Rejecteé">
+                                                <i class="fa-solid fa-ban" style="color: #ff0000;"></i>
+                                            </a>
+                                        <?php } elseif ($article["status"] == "pending") { ?>
+                                            <a href="blogs.php?id_approuve=<?= $article["id"] ?>" class="bg-green-100 text-green-600 p-2 rounded-lg hover:bg-green-200 transition" title="Approuvée">
+                                                <i class="fa-solid fa-check" style="color: #1ae000;"></i>
+                                            </a>
+                                            <a href="blogs.php?id_reject=<?= $article["id"] ?>" class="bg-red-100 text-red-600 p-2 rounded-lg hover:bg-red-200 transition" title="Rejecteé">
+                                                <i class="fa-solid fa-ban" style="color: #ff0000;"></i>
+
+                                            </a>
+                                        <?php } else { ?>
+                                            <a href="blogs.php?id_approuve=<?= $article["id"] ?>" class="bg-green-100 text-green-600 p-2 rounded-lg hover:bg-green-200 transition" title="Approuvée">
+                                                <i class="fa-solid fa-check" style="color: #1ae000;"></i>
+                                            </a>
+                                        <?php } ?>
                                     </div>
                                 </td>
                             </tr>
-                        </tbody>
-                    </table>
+                        <?php } ?>
+
+                        
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination -->
+            <div class="p-6 bg-gray-50 border-t border-gray-200">
+                <div class="flex flex-col sm:flex-row justify-between items-center gap-4">
+                    <p class="text-sm text-gray-500">
+                        Affichage <span class="font-bold text-gray-800">1-4</span> sur <span class="font-bold text-gray-800">48</span> articles
+                    </p>
+                    <div class="flex gap-2">
+                        <button class="px-4 py-2 bg-white border border-gray-200 rounded-lg hover:bg-gray-100 transition shadow-sm flex items-center gap-2 text-sm">
+                            <i class="fas fa-chevron-left text-xs"></i>
+                            <span>Précédent</span>
+                        </button>
+                        <button class="px-4 py-2 bg-blue-600 text-white border border-blue-600 rounded-lg hover:bg-blue-700 transition shadow-sm text-sm">
+                            1
+                        </button>
+                        <button class="px-4 py-2 bg-white border border-gray-200 rounded-lg hover:bg-gray-100 transition shadow-sm text-sm">
+                            2
+                        </button>
+                        <button class="px-4 py-2 bg-white border border-gray-200 rounded-lg hover:bg-gray-100 transition shadow-sm text-sm">
+                            3
+                        </button>
+                        <button class="px-4 py-2 bg-white border border-gray-200 rounded-lg hover:bg-gray-100 transition shadow-sm flex items-center gap-2 text-sm">
+                            <span>Suivant</span>
+                            <i class="fas fa-chevron-right text-xs"></i>
+                        </button>
+                    </div>
                 </div>
             </div>
-        </main>
+        </div>
     </div>
+</main>
+
+<script>
+    // Mobile sidebar toggle functionality
+    const mobileMenuToggle = document.getElementById('mobileMenuToggle');
+    const sidebar = document.querySelector('.sidebar');
+    const overlay = document.getElementById('overlay');
+
+    if (mobileMenuToggle && sidebar && overlay) {
+        mobileMenuToggle.addEventListener('click', function() {
+            sidebar.classList.toggle('active');
+            overlay.classList.toggle('hidden');
+        });
+
+        overlay.addEventListener('click', function() {
+            sidebar.classList.remove('active');
+            overlay.classList.add('hidden');
+        });
+
+        // Close sidebar when clicking on a link (mobile)
+        sidebar.querySelectorAll('a').forEach(link => {
+            link.addEventListener('click', function() {
+                if (window.innerWidth < 1024) {
+                    sidebar.classList.remove('active');
+                    overlay.classList.add('hidden');
+                }
+            });
+        });
+    }
+</script>
 
 </body>
+
 </html>
