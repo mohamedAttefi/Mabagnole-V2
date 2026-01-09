@@ -68,6 +68,9 @@ $themes = Theme::all();
         </button>
     </div>
 </main>
+<a href="../../client/blogs/write-article.php" class="fixed bottom-8 right-8 w-14 h-14 rounded-full bg-blue-600 text-white flex items-center justify-center shadow-2xl shadow-blue-300 hover:bg-blue-700 hover:scale-110 transition-all z-50">
+    <i class="fas fa-pen text-lg"></i>
+</a>
 
 <footer class="bg-white border-t border-slate-100 py-12 text-center">
     <p class="text-slate-400 font-bold text-xs uppercase tracking-widest">© 2024 MaBagnole Mag — Tous droits réservés</p>
