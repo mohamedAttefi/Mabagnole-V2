@@ -27,7 +27,7 @@ class Utilisateur
         self::initPDO();
     }
 
-    private static function initPDO()
+    protected static function initPDO()
     {
         if (self::$pdo === null) {
             self::$pdo = DataBase::getInstance()->getConnection();
