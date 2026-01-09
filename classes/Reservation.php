@@ -67,7 +67,7 @@ class Reservation
             while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
                 $reservations[] = $row;
             }
-// print_r($reservations);
+            // print_r($reservations);
             return $reservations;
         } catch (PDOException $e) {
             error_log("Error in Reservation::getUserReservations(): " . $e->getMessage());
@@ -146,7 +146,7 @@ class Reservation
     }
 
 
-    public function updateStatus($status)
+    public static function updateStatus($id, $status)
     {
         self::initPDO();
 
@@ -157,10 +157,9 @@ class Reservation
                 WHERE id = ?
             ");
 
-            $result = $stmt->execute([$status, $this->id]);
+            $result = $stmt->execute([$status, $id]);
 
             if ($result) {
-                $this->statut = $status;
                 return true;
             }
             return false;
@@ -238,19 +237,24 @@ class Reservation
         }
     }
 
-    public static function getAll($limit = null, $status = null)
+    public static function getAll($user_id = null, $limit = null, $status = null)
     {
         self::initPDO();
 
-        $sql = "SELECT r.*, v.marque, v.modele, u.nom, u.prenom
+        $sql = "SELECT r.*, v.marque, v.modele, v.carburant ,v.annee, v.immatriculation, v.prix_journalier, v.image_url, u.nom
                     FROM reservations r
-                    JOIN vehicules v ON r.vehicule_id = v.id
-                    JOIN clients u ON r.client_id = u.id";
+                    JOIN listevehicules v ON r.vehicule_id = v.id
+                    JOIN utilisateurs u ON r.client_id = u.id where 1=1";
 
         $params = [];
+        if ($user_id) {
+            $sql .= " and u.id = ?";
+            $params[] = $user_id;
+        }
+
 
         if ($status) {
-            $sql .= " WHERE r.statut = ?";
+            $sql .= " and r.statut = ?";
             $params[] = $status;
         }
 
