@@ -1,34 +1,18 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mon Profil - MaBagnole</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>body { font-family: 'Poppins', sans-serif; }</style>
-</head>
-<body class="bg-gray-50">
+<?php 
+include "../includes/header.php";
+include "../classes/Client.php";
+include "../classes/Reservation.php";
+include "../classes/Review.php";
+include "../classes/Article.php";
 
-    <nav class="bg-white shadow-sm h-20">
-        <div class="max-w-7xl mx-auto px-4 h-full flex justify-between items-center">
-            <a href="index.html" class="flex items-center gap-2">
-                <i class="fas fa-car-side text-blue-600 text-3xl"></i>
-                <span class="text-2xl font-bold">MaBagnole</span>
-            </a>
-            <div class="flex items-center gap-6">
-                <a href="vehicles.html" class="text-gray-600 hover:text-blue-600">Véhicules</a>
-                <a href="blog.html" class="text-gray-600 hover:text-blue-600">Blog</a>
-                <div class="flex items-center gap-3 border-l pl-6">
-                    <span class="text-sm font-semibold text-gray-800">Thomas Legrand</span>
-                    <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&q=80&w=100" class="w-10 h-10 rounded-full border-2 border-blue-600">
-                </div>
-            </div>
-        </div>
-    </nav>
+$client = Client::findByEmail($_SESSION["user_email"]);
+$reservations = Reservation::findByUser($_SESSION["user_id"]);
+$reviews = Review::findByUser($_SESSION["user_id"]);
+$article = Article::findByUser($_SESSION["user_id"]);
 
-    <main class="max-w-7xl mx-auto px-4 py-10">
+?>
+
+    <main class="mt-[100px] max-w-7xl mx-auto px-4 py-10">
         <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
             
             <aside class="lg:col-span-1 space-y-4">
@@ -59,7 +43,7 @@
                     <div class="px-8 pb-8">
                         <div class="relative flex justify-between items-end -mt-12 mb-8">
                             <div class="relative group">
-                                <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&q=80&w=100" class="w-32 h-32 rounded-xl border-4 border-white shadow-lg object-cover">
+                                <img src="https://i.pinimg.com/736x/1f/96/71/1f96719d94013db918a66874fdfdda98.jpg" class="w-32 h-32 rounded-xl border-4 border-white shadow-lg object-cover">
                                 <button class="absolute bottom-2 right-2 bg-white p-2 rounded-lg shadow-md hover:text-blue-600 transition">
                                     <i class="fas fa-camera"></i>
                                 </button>
@@ -70,19 +54,19 @@
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
                                 <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Prénom & Nom</label>
-                                <p class="text-gray-800 font-medium border-b pb-2">Thomas Legrand</p>
+                                <p class="text-gray-800 font-medium border-b pb-2"><?= $client->__get("nom") ?></p>
                             </div>
                             <div>
                                 <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Email</label>
-                                <p class="text-gray-800 font-medium border-b pb-2">t.legrand@exemple.com</p>
+                                <p class="text-gray-800 font-medium border-b pb-2"><?= $client->__get("email") ?></p>
                             </div>
                             <div>
                                 <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Téléphone</label>
-                                <p class="text-gray-800 font-medium border-b pb-2">+33 6 12 34 56 78</p>
+                                <p class="text-gray-800 font-medium border-b pb-2"><?= $client->__get("telephone") ?></p>
                             </div>
                             <div>
                                 <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Date d'inscription</label>
-                                <p class="text-gray-800 font-medium border-b pb-2">12 Janvier 2024</p>
+                                <p class="text-gray-800 font-medium border-b pb-2"><?= (new DateTime($client->__get("dateInscription")))->format("Y-m-d") ?></p>
                             </div>
                         </div>
                     </div>
@@ -94,7 +78,7 @@
                             <i class="fas fa-car"></i>
                         </div>
                         <div>
-                            <span class="block text-2xl font-bold">04</span>
+                            <span class="block text-2xl font-bold"><?= count($reservations) ?></span>
                             <span class="text-xs text-gray-500 font-bold uppercase">Locations</span>
                         </div>
                     </div>
@@ -103,7 +87,7 @@
                             <i class="fas fa-pen"></i>
                         </div>
                         <div>
-                            <span class="block text-2xl font-bold">02</span>
+                            <span class="block text-2xl font-bold"><?= count($article) ?></span>
                             <span class="text-xs text-gray-500 font-bold uppercase">Articles</span>
                         </div>
                     </div>
@@ -112,7 +96,7 @@
                             <i class="fas fa-star"></i>
                         </div>
                         <div>
-                            <span class="block text-2xl font-bold">18</span>
+                            <span class="block text-2xl font-bold"><?= count($reviews)??0 ?></span>
                             <span class="text-xs text-gray-500 font-bold uppercase">Avis reçus</span>
                         </div>
                     </div>
