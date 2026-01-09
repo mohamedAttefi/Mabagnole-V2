@@ -7,19 +7,16 @@ $id_reservation = $_GET["id"];
 
 
 $reservation = Reservation::find($id_reservation);
+echo($reservation["prix_total"]);
 
 $avis = Review::findByUser($_SESSION["user_id"], $id_reservation);
-// print_r($avis);
 // var_dump($reservation);
 
 $reservation_class = ["en_attente" => "bg-gray-100 text-gray-800", "confirmee" => "bg-green-100 text-green-800", "annulee" => "bg-red-100 text-red-800"]
 
 
 ?>
-<!-- Header -->
 
-
-<!-- Header avec statut -->
 <div class="mt-[100px] flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
     <div>
         <h1 class="text-2xl md:text-3xl font-bold text-gray-800 mb-2">Détails de la réservation</h1>
@@ -229,13 +226,13 @@ $reservation_class = ["en_attente" => "bg-gray-100 text-gray-800", "confirmee" =
             <div class="space-y-3">
                 <div class="flex justify-between">
                     <span class="text-gray-600">Location (<?= $nombreJours ?> jours)</span>
-                    <span class="font-medium"><?=  $avis["prix_journalier"] ?> €/jour</span>
+                    <span class="font-medium"><?=  $reservation["prix_total"] ?> €/jour</span>
                 </div>
                 
                 <div class="border-t pt-3 mt-3">
                     <div class="flex justify-between font-bold text-lg">
                         <span>Total</span>
-                        <span class="text-blue-600"><?= $nombreJours * $avis["prix_journalier"] ?> €</span>
+                        <span class="text-blue-600"><?= $reservation["prix_total"] ?> €</span>
                     </div>
                 </div>
             </div>
