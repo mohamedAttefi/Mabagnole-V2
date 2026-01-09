@@ -1,139 +1,228 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestion Réservations - Admin MaBagnole</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>body { font-family: 'Poppins', sans-serif; }</style>
-</head>
-<body class="bg-gray-50">
+<?php
+session_start();
+if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] !== 'admin') {
+    header('Location: ../index.php');
+    exit();
+}
+include "../header.php";
+include "../../classes/Reservation.php";
 
-    <div class="flex min-h-screen">
-        <aside class="w-64 bg-white shadow-sm hidden lg:flex flex-col sticky top-0 h-screen">
-            <div class="p-6 border-b text-center">
-                <span class="text-xl font-bold">Ma<span class="text-blue-600">Bagnole</span> Admin</span>
-            </div>
-            <nav class="flex-grow p-4 space-y-2 mt-4">
-                <a href="admin-dashboard.html" class="flex items-center gap-3 p-3 text-gray-600 hover:bg-gray-50 rounded-lg transition">
-                    <i class="fas fa-chart-pie w-5"></i> Dashboard
-                </a>
-                <a href="admin-fleet.html" class="flex items-center gap-3 p-3 text-gray-600 hover:bg-gray-50 rounded-lg transition">
-                    <i class="fas fa-car w-5"></i> Gestion Flotte
-                </a>
-                <a href="admin-bookings.html" class="flex items-center gap-3 p-3 bg-blue-50 text-blue-600 rounded-lg font-bold transition">
-                    <i class="fas fa-calendar-check w-5"></i> Réservations
-                </a>
-                <a href="admin-users.html" class="flex items-center gap-3 p-3 text-gray-600 hover:bg-gray-50 rounded-lg transition">
-                    <i class="fas fa-users w-5"></i> Utilisateurs
-                </a>
-            </nav>
-        </aside>
+$reservation_en_attente = Reservation::getAll(null, null, "en_attente");
+$reservation_confirmee = Reservation::getAll(null, null, "confirmee");
+$reservation_annulee = Reservation::getAll(null, null, "annulee");
+$reservations = Reservation::getAll();
 
-        <main class="flex-grow p-8">
-            <div class="mb-8">
-                <h1 class="text-2xl font-bold text-gray-800">Suivi des Réservations</h1>
-                <p class="text-sm text-gray-500">Validez les demandes et gérez les contrats de location en cours.</p>
-            </div>
+?>
 
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-                <button class="bg-white p-4 rounded-xl shadow-sm border-b-4 border-blue-500 hover:shadow-md transition text-left">
-                    <span class="text-xs font-bold text-gray-400 uppercase">En attente</span>
-                    <span class="block text-2xl font-bold text-blue-600">12</span>
-                </button>
-                <button class="bg-white p-4 rounded-xl shadow-sm border-b-4 border-green-500 hover:shadow-md transition text-left">
-                    <span class="text-xs font-bold text-gray-400 uppercase">Confirmées</span>
-                    <span class="block text-2xl font-bold text-green-600">45</span>
-                </button>
-                <button class="bg-white p-4 rounded-xl shadow-sm border-b-4 border-orange-500 hover:shadow-md transition text-left">
-                    <span class="text-xs font-bold text-gray-400 uppercase">Terminées</span>
-                    <span class="block text-2xl font-bold text-orange-600">128</span>
-                </button>
-                <button class="bg-white p-4 rounded-xl shadow-sm border-b-4 border-red-500 hover:shadow-md transition text-left">
-                    <span class="text-xs font-bold text-gray-400 uppercase">Annulées</span>
-                    <span class="block text-2xl font-bold text-red-600">04</span>
-                </button>
-            </div>
+<main class="main-content">
+    <div class="p-6 lg:p-8 pt-20 lg:pt-8">
+        <!-- Page Header -->
+        <div class="mb-8">
+            <h1 class="text-2xl lg:text-3xl font-bold text-gray-800">Suivi des Réservations</h1>
+            <p class="text-sm text-gray-500 mt-1">Validez les demandes et gérez les contrats de location en cours.</p>
+        </div>
 
-            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-                <div class="p-6 border-b flex flex-col md:flex-row justify-between items-center gap-4">
-                    <div class="relative w-full md:w-96">
-                        <input type="text" placeholder="Rechercher par n° de réservation ou client..." class="w-full pl-10 pr-4 py-2 bg-gray-50 border rounded-lg text-sm outline-none focus:ring-2 focus:ring-blue-600">
-                        <i class="fas fa-search absolute left-3 top-2.5 text-gray-400"></i>
+        <!-- Stats Cards -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition">
+                <div class="flex items-center gap-4">
+                    <div class="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
+                        <i class="fas fa-clock text-blue-600 text-lg"></i>
                     </div>
-                    <button class="text-sm text-blue-600 font-bold hover:bg-blue-50 px-4 py-2 rounded-lg transition">
-                        <i class="fas fa-filter mr-2"></i> Filtres avancés
-                    </button>
-                </div>
-
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left">
-                        <thead class="bg-gray-50 text-[10px] text-gray-400 uppercase font-bold tracking-wider">
-                            <tr>
-                                <th class="px-6 py-4">ID / Client</th>
-                                <th class="px-6 py-4">Véhicule</th>
-                                <th class="px-6 py-4">Période</th>
-                                <th class="px-6 py-4">Montant</th>
-                                <th class="px-6 py-4">Statut</th>
-                                <th class="px-6 py-4 text-right">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-gray-100 text-sm">
-                            <tr class="hover:bg-gray-50 transition">
-                                <td class="px-6 py-4">
-                                    <p class="font-bold text-gray-800">#RES-7429</p>
-                                    <p class="text-xs text-gray-500">Thomas Legrand</p>
-                                </td>
-                                <td class="px-6 py-4 text-gray-600">Tesla Model 3</td>
-                                <td class="px-6 py-4">
-                                    <p class="font-medium">10/01 - 15/01</p>
-                                    <p class="text-[10px] text-blue-500">5 Jours</p>
-                                </td>
-                                <td class="px-6 py-4 font-bold">445,00 €</td>
-                                <td class="px-6 py-4">
-                                    <span class="bg-blue-100 text-blue-600 text-[10px] font-bold px-2 py-1 rounded-full uppercase">Attente Confirmation</span>
-                                </td>
-                                <td class="px-6 py-4 text-right">
-                                    <div class="flex justify-end gap-2">
-                                        <button class="bg-green-500 text-white p-2 rounded-lg hover:bg-green-600 transition" title="Confirmer"><i class="fas fa-check"></i></button>
-                                        <button class="bg-red-100 text-red-500 p-2 rounded-lg hover:bg-red-200 transition" title="Annuler"><i class="fas fa-times"></i></button>
-                                        <button class="bg-gray-100 text-gray-600 p-2 rounded-lg hover:bg-gray-200 transition"><i class="fas fa-eye"></i></button>
-                                    </div>
-                                </td>
-                            </tr>
-
-                            <tr class="hover:bg-gray-50 transition">
-                                <td class="px-6 py-4">
-                                    <p class="font-bold text-gray-800">#RES-7420</p>
-                                    <p class="text-xs text-gray-500">Julie Bernard</p>
-                                </td>
-                                <td class="px-6 py-4 text-gray-600">Audi A3 Sportback</td>
-                                <td class="px-6 py-4">
-                                    <p class="font-medium">05/01 - 08/01</p>
-                                    <p class="text-[10px] text-green-500 font-bold uppercase">En cours</p>
-                                </td>
-                                <td class="px-6 py-4 font-bold">280,00 €</td>
-                                <td class="px-6 py-4">
-                                    <span class="bg-green-100 text-green-600 text-[10px] font-bold px-2 py-1 rounded-full uppercase">Confirmé</span>
-                                </td>
-                                <td class="px-6 py-4 text-right">
-                                    <div class="flex justify-end gap-2">
-                                        <button class="bg-blue-600 text-white px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-blue-700 transition">Retour véhicule</button>
-                                    </div>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-                
-                <div class="p-6 bg-gray-50 flex justify-center border-t">
-                    <button class="text-sm font-bold text-gray-400 hover:text-blue-600 transition">Charger plus de réservations...</button>
+                    <div>
+                        <p class="text-slate-500 text-sm">En attente</p>
+                        <p class="text-2xl font-bold text-blue-600"><?= count($reservation_en_attente) ?></p>
+                    </div>
                 </div>
             </div>
-        </main>
+
+            <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition">
+                <div class="flex items-center gap-4">
+                    <div class="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center">
+                        <i class="fas fa-check-circle text-green-600 text-lg"></i>
+                    </div>
+                    <div>
+                        <p class="text-slate-500 text-sm">Confirmées</p>
+                        <p class="text-2xl font-bold text-green-600"><?= count($reservation_confirmee) ?></p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition">
+                <div class="flex items-center gap-4">
+                    <div class="w-12 h-12 bg-red-100 rounded-xl flex items-center justify-center">
+                        <i class="fas fa-times-circle text-red-600 text-lg"></i>
+                    </div>
+                    <div>
+                        <p class="text-slate-500 text-sm">Annulées</p>
+                        <p class="text-2xl font-bold text-red-600"><?= count($reservation_annulee) ?></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Search and Filter Bar -->
+        <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 mb-8">
+            <div class="flex flex-col lg:flex-row gap-4 items-center">
+                <div class="relative flex-grow">
+                    <input type="text"
+                        placeholder="Rechercher par n° de réservation, client ou véhicule..."
+                        class="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm outline-none focus:ring-2 focus:ring-blue-600 focus:border-blue-600">
+                    <i class="fas fa-search absolute left-3 top-3.5 text-gray-400"></i>
+                </div>
+
+                <select class="bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-blue-600">
+                    <option>Tous les statuts</option>
+                    <option>En attente</option>
+                    <option>Confirmées</option>
+                    <option>En cours</option>
+                    <option>Terminées</option>
+                    <option>Annulées</option>
+                </select>
+
+                <input type="date"
+                    class="bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-blue-600">
+
+                <button class="text-sm text-blue-600 font-bold hover:bg-blue-50 px-4 py-3 rounded-xl transition flex items-center gap-2 whitespace-nowrap">
+                    <i class="fas fa-filter"></i>
+                    Filtres avancés
+                </button>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="w-full min-w-[900px]">
+                    <thead class="bg-gray-50">
+                        <tr class="text-gray-400 text-xs uppercase tracking-wider font-bold">
+                            <th class="px-6 py-4 text-left">Client</th>
+                            <th class="px-6 py-4 text-left">Véhicule</th>
+                            <th class="px-6 py-4 text-left">Période</th>
+                            <th class="px-6 py-4 text-left">Montant</th>
+                            <th class="px-6 py-4 text-left">Statut</th>
+                            <th class="px-6 py-4 text-right">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-100">
+                        <?php foreach ($reservations as $reservation) { ?>
+                            <tr class="hover:bg-gray-50 transition">
+                                <td class="px-6 py-4">
+                                    <div class="flex items-center gap-2 mt-1">
+
+                                        <p class="text-xs text-gray-500"><?= $reservation["nom"] ?></p>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <div class="flex items-center gap-3">
+                                        <img src="<?= $reservation["image_url"] ?>" class="w-12 h-10 object-cover rounded-md">
+                                        <div>
+                                            <p class="text-sm font-medium text-gray-800"><?= $reservation["marque"] . " " . $reservation["modele"] ?></p>
+                                            <p class="text-xs text-gray-500">Immat: <?= $reservation["immatriculation"] ?></p>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <div class="space-y-1">
+                                        <p class="text-sm font-medium text-gray-800"><?= (new DateTime($reservation["date_debut"]))->format("m/d") ?> - <?= (new DateTime($reservation["date_fin"]))->format("m/d") ?></p>
+                                        <?php
+                                        $debut = new DateTime($reservation["date_debut"]);
+                                        $fin = new DateTime($reservation["date_fin"]);
+                                        $interval = $debut->diff($fin);
+                                        $nbJours = $interval->days;
+                                        ?>
+                                        <p class="text-xs text-blue-600 font-bold"><?= $nbJours + 1 ?> jours</p>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <p class="text-lg font-bold text-gray-800"><?= $reservation["prix_total"] ?> €</p>
+                                    <p class="text-xs text-gray-500"><?= $reservation["prix_journalier"] ?>€/jour</p>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <span class="inline-flex items-center gap-1  <?= $reservation["statut"] == "annulee" ? "bg-red-100 text-red-600" : ($reservation["statut"] == "confirmee" ? "bg-green-100 text-green-600" : "bg-blue-100 text-blue-600") ?> text-xs font-bold px-3 py-1.5 rounded-full uppercase">
+                                        <i class="fas <?= $reservation["statut"] == "annulee" ? "fa-ban" : ($reservation["statut"] == "confirmee" ? "fa-check-circle" : "fa-clock") ?> text-xs"></i>
+                                        <?= $reservation["statut"] == "annulee" ? "ANNULE" : ($reservation["statut"] == "confirmee" ? "CONFIRME" : "ATTENTE") ?>
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <div class="flex justify-end gap-2">
+                                        <?php if ($reservation["statut"] == "en_attente") { ?>
+                                            <a href="reservation-approval.php?id=<?= $reservation["id"] ?>" class="bg-green-500 text-white p-2 rounded-lg hover:bg-green-600 transition" title="Confirmer">
+                                                <i class="fas fa-check"></i>
+                                            </a>
+                                        <?php } ?>
+                                        <a href="reservation-annulee.php?id=<?= $reservation["id"] ?>" class="bg-red-100 text-red-500 p-2 rounded-lg hover:bg-red-200 transition" title="Annuler">
+                                            <i class="fas fa-times"></i>
+                                        </a>
+                                        <a class="bg-gray-100 text-gray-600 p-2 rounded-lg hover:bg-gray-200 transition" title="Voir détails">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        <?php } ?>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="p-6 bg-gray-50 border-t border-gray-200">
+                <div class="flex flex-col sm:flex-row justify-between items-center gap-4">
+                    <p class="text-sm text-gray-500">
+                        Affichage <span class="font-bold text-gray-800">1-4</span> sur <span class="font-bold text-gray-800">189</span> réservations
+                    </p>
+                    <div class="flex gap-2">
+                        <button class="px-4 py-2 bg-white border border-gray-200 rounded-lg hover:bg-gray-100 transition shadow-sm flex items-center gap-2 text-sm">
+                            <i class="fas fa-chevron-left text-xs"></i>
+                            <span>Précédent</span>
+                        </button>
+                        <button class="px-4 py-2 bg-blue-600 text-white border border-blue-600 rounded-lg hover:bg-blue-700 transition shadow-sm text-sm">
+                            1
+                        </button>
+                        <button class="px-4 py-2 bg-white border border-gray-200 rounded-lg hover:bg-gray-100 transition shadow-sm text-sm">
+                            2
+                        </button>
+                        <button class="px-4 py-2 bg-white border border-gray-200 rounded-lg hover:bg-gray-100 transition shadow-sm text-sm">
+                            3
+                        </button>
+                        <button class="px-4 py-2 bg-white border border-gray-200 rounded-lg hover:bg-gray-100 transition shadow-sm flex items-center gap-2 text-sm">
+                            <span>Suivant</span>
+                            <i class="fas fa-chevron-right text-xs"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
+</main>
+
+<script>
+    // Mobile sidebar toggle functionality
+    const mobileMenuToggle = document.getElementById('mobileMenuToggle');
+    const sidebar = document.querySelector('.sidebar');
+    const overlay = document.getElementById('overlay');
+
+    if (mobileMenuToggle && sidebar && overlay) {
+        mobileMenuToggle.addEventListener('click', function() {
+            sidebar.classList.toggle('active');
+            overlay.classList.toggle('hidden');
+        });
+
+        overlay.addEventListener('click', function() {
+            sidebar.classList.remove('active');
+            overlay.classList.add('hidden');
+        });
+
+        // Close sidebar when clicking on a link (mobile)
+        sidebar.querySelectorAll('a').forEach(link => {
+            link.addEventListener('click', function() {
+                if (window.innerWidth < 1024) {
+                    sidebar.classList.remove('active');
+                    overlay.classList.add('hidden');
+                }
+            });
+        });
+    }
+</script>
 
 </body>
+
 </html>
