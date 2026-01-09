@@ -36,7 +36,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login'])) {
             print_r($_SESSION);
 
             if($user->__get("role") == "client"){
-                header("location: ../index.php");
+                header("location: ../client/dashboard.php");
+                exit;
+            }else{
+                header("location: ../admin/dashboard.php");
+                exit;
             }
             
         } else {
