@@ -10,4 +10,3 @@ $comment = $_POST["comment"];
 echo $user_id ." ". $reservation_id." ". $vehicule_id." ". $note." ". $comment;
 $Review = new Review(null, $user_id, $vehicule_id, $reservation_id, $note, $comment, null);
 $Review->create();
-
