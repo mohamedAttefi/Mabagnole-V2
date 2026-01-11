@@ -197,8 +197,34 @@ SELECT
             
 update vehicules set disponible = 1;
 
+
+SELECT t.name,t.description, count(b.id) as total from themes t left join blog_articles b on t.id = b.theme_id GROUP BY b.theme_id, t.name, t.description
+
      UPDATE reservations
                 SET statut = "confirmee"
                 WHERE id = 4
 
+
+                SELECT t.name,t.description,b.created_at, count(b.theme_id) as total from themes t left join blog_articles b on t.id = b.theme_id GROUP BY b.theme_id, t.name
+
 SELECT *, c.content as commentaire, u.nom as user_name from blog_comments c join utilisateurs u on c.user_id = u.id join blog_articles a on c.article_id = a.id
+
+SELECT @@sql_mode;
+
+select *, count(a.article_id) as total_articles from blog_tags t left join article_tags a on t.id = a.tag_id GROUP BY t.id;
+
+
+SELECT * FROM blog_articles ORDER BY created_at DESC;
+
+SELECT * FROM blog_articles 
+ORDER BY created_at DESC
+LIMIT 6 OFFSET 6; 
+
+
+SELECT a.*, u.nom as user_name, t.name as theme_name 
+                FROM blog_articles a
+                JOIN utilisateurs u ON a.user_id = u.id
+                JOIN themes t ON a.theme_id = t.id
+                WHERE a.status = 'approved'
+                ORDER BY a.created_at DESC
+                LIMIT 6 OFFSET 0;
