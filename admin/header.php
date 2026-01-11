@@ -8,6 +8,8 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
@@ -74,7 +76,7 @@
 
 <body class="bg-[#F8FAFC]">
     <!-- Admin Sidebar -->
-    <aside class="sidebar fixed top-0 left-0 text-white">
+    <aside class="sidebar fixed top-0 left-0 text-white ">
         <div class="p-6 border-b border-slate-700">
             <div class="flex items-center gap-3 mb-6">
                 <div class="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl flex items-center justify-center">
@@ -86,8 +88,8 @@
                 </div>
             </div>
 
-            <div class="space-y-1">
-                <a href="/MABAGNOLE-V2/admin/dashboard.php" class="flex items-center gap-3 p-3 bg-blue-600 rounded-lg font-medium">
+            <div class="">
+                <a href="/MABAGNOLE-V2/admin/dashboard.php" class="flex items-center gap-3 p-3 text-slate-300 hover:bg-slate-800 rounded-lg transition">
                     <i class="fas fa-chart-pie w-5"></i>
                     Tableau de bord
                 </a>
@@ -108,26 +110,35 @@
                     Avis
                 </a>
                 <a href="/MABAGNOLE-V2/admin/Gestion_des_catégories/categories.php" class="flex items-center gap-3 p-3 text-slate-300 hover:bg-slate-800 rounded-lg transition">
-                    <i class="fas fa-car w-5"></i>
+                    <i class="fa-solid fa-layer-group"></i>
                     Categories
                 </a>
-                <a href="/MABAGNOLE-V2/admin/Gestion_du_blog/blogs.php" class="flex items-center gap-3 p-3 text-slate-300 hover:bg-slate-800 rounded-lg transition">
-                    <i class="fas fa-users w-5"></i>
-                    Blogs
+                <a href="/MABAGNOLE-V2/admin/Gestion_du_blog/blog-categories.php" class="flex items-center gap-3 p-3 text-slate-300 hover:bg-slate-800 rounded-lg transition">
+                    <i class="fa-solid fa-list"></i>
+                    Themes
                 </a>
+                <a href="/MABAGNOLE-V2/admin/Gestion_du_blog/blogs.php" class="flex items-center gap-3 p-3 text-slate-300 hover:bg-slate-800 rounded-lg transition">
+                    <i class="fa-solid fa-newspaper"></i>
+                    Articles
+                </a>
+                <a href="/MABAGNOLE-V2/admin/Gestion_du_blog/blog-comments.php" class="flex items-center gap-3 p-3 text-slate-300 hover:bg-slate-800 rounded-lg transition">
+                    <i class="fa-solid fa-comment"></i>
+                    Comments
+                </a>
+                <a href="/MABAGNOLE-V2/admin/Gestion_du_blog/blog-tags.php" class="flex items-center gap-3 p-3 text-slate-300 hover:bg-slate-800 rounded-lg transition">
+                    <i class="fa-solid fa-tag"></i>
+                    Tags
+                </a>
+
+
             </div>
         </div>
 
-        <div class="p-6">
-            <div class="mb-6">
-                <p class="text-slate-400 text-xs uppercase tracking-wider mb-2">Rapports</p>
+        <div class="">
+            <div class="">
                 <a href="/MABAGNOLE-V2/public/logout.php" class="flex items-center gap-3 p-3 text-slate-300 hover:bg-slate-800 rounded-lg transition">
-                    <i class="fas fa-file-invoice-dollar w-5"></i>
+                    <i class="fa-solid fa-arrow-right-from-bracket"></i>
                     Deconnection
-                </a>
-                <a href="#" class="flex items-center gap-3 p-3 text-slate-300 hover:bg-slate-800 rounded-lg transition">
-                    <i class="fas fa-chart-line w-5"></i>
-                    Performance
                 </a>
             </div>
         </div>
