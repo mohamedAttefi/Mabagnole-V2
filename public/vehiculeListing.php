@@ -1,163 +1,266 @@
 <?php
 include "../classes/Vehicle.php";
+include "../classes/Categorie.php";
 include "../includes/header.php";
 
 $vehicles = Vehicle::all();
+$categories = Categorie::all();
+
+
 ?>
 
+<header class="py-12 bg-white border-b border-slate-100">
+    <div class="max-w-7xl mx-auto px-4">
+        <nav class="flex mb-4 text-xs font-bold uppercase tracking-widest text-slate-400 gap-2">
+            <a href="index.html" class="hover:text-blue-600">Accueil</a>
+            <span>/</span>
+            <span class="text-slate-900">Catalogue</span>
+        </nav>
+        <h1 class="text-4xl font-black text-slate-900 mb-2">Explorez notre flotte</h1>
+        <p class="text-slate-500 font-medium">Plus de <span class="text-blue-600 font-bold"><?= count($vehicles) ?> véhicules</span> prêts pour votre prochaine aventure.</p>
+    </div>
+</header>
 
+<main class="max-w-7xl mx-auto px-4 py-12">
+    <div class="bg-white rounded-[2rem] p-6 shadow-sm border border-slate-100 mb-8">
+        <form id=" filterForm">
+            <div class="flex flex-col lg:flex-row gap-6 items-start lg:items-center">
+                <div class="flex-1">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
 
-    <header class="py-12 bg-white border-b border-slate-100">
-        <div class="max-w-7xl mx-auto px-4">
-            <nav class="flex mb-4 text-xs font-bold uppercase tracking-widest text-slate-400 gap-2">
-                <a href="index.html" class="hover:text-blue-600">Accueil</a>
-                <span>/</span>
-                <span class="text-slate-900">Catalogue</span>
-            </nav>
-            <h1 class="text-4xl font-black text-slate-900 mb-2">Explorez notre flotte</h1>
-            <p class="text-slate-500 font-medium">Plus de <span class="text-blue-600 font-bold">150 véhicules</span> prêts pour votre prochaine aventure.</p>
-        </div>
-    </header>
-
-    <main class="max-w-7xl mx-auto px-4 py-12">
-        <div class="flex flex-col lg:flex-row gap-10">
-
-            <aside class="w-full lg:w-1/4">
-                <div class="sticky top-28 space-y-6">
-                    <div class="bg-white p-8 rounded-[2rem] shadow-sm border border-slate-100">
-                        <div class="flex items-center justify-between mb-8">
-                            <h2 class="text-xl font-extrabold flex items-center gap-3 text-slate-800">
-                                <i class="fas fa-sliders text-blue-600"></i> Filtres
-                            </h2>
-                            <button class="text-xs font-bold text-blue-600 hover:underline">Reset</button>
-                        </div>
-
-                        <div class="mb-8">
-                            <label class="block text-xs font-black uppercase tracking-widest text-slate-400 mb-4">Recherche libre</label>
-                            <div class="relative">
-                                <input type="text" placeholder="Marque ou modèle..." class="w-full pl-12 pr-4 py-4 bg-slate-50 border-none rounded-2xl focus:ring-2 focus:ring-blue-600 transition font-medium text-sm">
-                                <i class="fas fa-search absolute left-5 top-1/2 -translate-y-1/2 text-slate-400"></i>
-                            </div>
-                        </div>
-
-                        <div class="mb-8">
-                            <label class="block text-xs font-black uppercase tracking-widest text-slate-400 mb-4">Catégories</label>
-                            <div class="grid grid-cols-1 gap-3">
-                                <label class="flex items-center p-3 rounded-xl hover:bg-slate-50 cursor-pointer transition group">
-                                    <input type="checkbox" class="custom-checkbox hidden" checked>
-                                    <div class="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center mr-4 group-hover:bg-blue-600 group-hover:text-white transition">
-                                        <i class="fas fa-car-side text-sm"></i>
-                                    </div>
-                                    <span class="text-sm font-medium text-slate-600">Citadines</span>
-                                </label>
-                                <label class="flex items-center p-3 rounded-xl hover:bg-slate-50 cursor-pointer transition group">
-                                    <input type="checkbox" class="custom-checkbox hidden">
-                                    <div class="w-10 h-10 rounded-lg bg-slate-100 flex items-center justify-center mr-4 group-hover:bg-blue-600 group-hover:text-white transition">
-                                        <i class="fas fa-truck-pickup text-sm"></i>
-                                    </div>
-                                    <span class="text-sm font-medium text-slate-600">SUV & 4x4</span>
-                                </label>
-                            </div>
-                        </div>
-
-                        <div class="mb-8">
-                            <label class="block text-xs font-black uppercase tracking-widest text-slate-400 mb-4 flex justify-between">
-                                Budget max <span>150€/j</span>
+                        <div>
+                            <label class="block text-xs font-bold uppercase tracking-widest text-slate-500 mb-2">
+                                Catégorie
                             </label>
-                            <input type="range" min="30" max="500" class="w-full h-1.5 bg-slate-100 rounded-lg appearance-none cursor-pointer accent-blue-600">
+                            <select id="filterCategory" name="categorie" class="w-full px-4 py-3 bg-slate-50 border-none rounded-xl text-slate-700 font-medium focus:ring-2 focus:ring-blue-600 transition">
+                                <option value="">Toutes les catégories</option>
+                                <?php foreach ($categories as $categorie): ?>
+                                    <option value="<?= htmlspecialchars($categorie["id"]) ?>"><?= htmlspecialchars($categorie["name"]) ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold uppercase tracking-widest text-slate-500 mb-2">
+                                <i class="fas fa-search mr-2"></i>Recherche
+                            </label>
+                            <input type="text"
+                                id="searchInput"
+                                name="search"
+                                placeholder="Marque, modèle..."
+                                class="w-full px-4 py-3 bg-slate-50 border-none rounded-xl text-slate-700 font-medium focus:ring-2 focus:ring-blue-600 transition">
                         </div>
 
-                        <button class="w-full bg-blue-600 text-white py-4 rounded-2xl font-bold shadow-xl shadow-blue-100 hover:bg-blue-700 transition transform active:scale-95">
-                            Appliquer les filtres
-                        </button>
-                    </div>
-                </div>
-            </aside>
-
-            <div class="w-full lg:w-3/4">
-                <div class="flex flex-col md:flex-row justify-between items-center mb-8 gap-4 px-2">
-                    <p class="text-slate-500 font-semibold">Affichage de <span class="text-slate-900 font-black">1-12</span> sur 158 résultats</p>
-                    <div class="flex items-center bg-white p-1 rounded-xl border border-slate-100 shadow-sm">
-                        <span class="text-xs font-black uppercase px-4 text-slate-400">Trier:</span>
-                        <select class="bg-transparent border-none text-sm font-bold text-slate-700 focus:ring-0 cursor-pointer pr-8">
-                            <option>Prix croissant</option>
-                            <option>Mieux notés</option>
-                            <option>Nouveautés</option>
-                        </select>
                     </div>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
-                    <?php foreach ($vehicles as $vehicle) { ?>
-
-                        <div class="bg-white rounded-[2.5rem] p-4 shadow-sm border border-slate-100 hover:shadow-2xl hover:shadow-slate-200 transition-all group overflow-hidden relative">
-                            <div class="absolute top-8 left-8 z-10">
-                                <span class="bg-emerald-500 text-white text-[10px] font-black uppercase px-3 py-1.5 rounded-full shadow-lg shadow-emerald-200"><?php echo $vehicle["disponible"] ? "Disponible" : "Indisponible" ?></span>
-                            </div>
-
-                            <div class="rounded-[2rem] overflow-hidden aspect-[4/3] mb-6 relative">
-                                <img src="<?= $vehicle["image_url"] ?>" class="w-full h-full object-cover group-hover:scale-110 transition duration-700">
-                                <div class="absolute inset-0 bg-blue-900/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                                    <a href="detaill-vehicules.php?id=<?= $vehicle["id"] ?>" class="bg-white text-slate-900 px-6 py-3 rounded-full font-bold text-sm transform translate-y-4 group-hover:translate-y-0 transition">Voir les détails</a>
-                                </div>
-                            </div>
-
-                            <div class="px-3 pb-4">
-                                <div class="flex justify-between items-start mb-2">
-                                    <div>
-                                        <h3 class="text-xl font-black text-slate-900"><?= $vehicle["marque"] ?> <?= $vehicle["modele"] ?></h3>
-                                        <p class="text-blue-600 text-xs font-bold uppercase tracking-widest"><?= $vehicle["categorie"] ?></p>
-                                    </div>
-                                    <div class="text-right">
-                                        <span class="text-2xl font-black text-slate-900"><?= $vehicle["prix_journalier"] ?>€</span>
-                                        <span class="text-xs font-bold text-slate-400 block">/ jour</span>
-                                    </div>
-                                </div>
-
-                                <div class="grid grid-cols-2 gap-3 mt-6 pt-6 border-t border-slate-50">
-                                    <div class="flex items-center gap-2 text-xs font-bold text-slate-500 bg-slate-50 p-2 rounded-xl">
-                                        <i class="fas fa-gas-pump text-blue-500"></i> <?= $vehicle["carburant"] ?>
-                                    </div>
-                                    <div class="flex items-center gap-2 text-xs font-bold text-slate-500 bg-slate-50 p-2 rounded-xl">
-                                        <i class="fas fa-users text-blue-500"></i> <?= $vehicle["nb_places"] ?> places
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                    <?php } ?>
-
-
-
-                </div>
-
-                <div class="mt-20 flex justify-center">
-                    <nav class="flex items-center gap-3 bg-white p-2 rounded-[2rem] border border-slate-100 shadow-sm">
-                        <button class="w-12 h-12 flex items-center justify-center rounded-2xl text-slate-400 hover:bg-slate-50 transition">
-                            <i class="fas fa-chevron-left text-xs"></i>
-                        </button>
-                        <button class="w-12 h-12 flex items-center justify-center rounded-2xl bg-blue-600 text-white font-black shadow-lg shadow-blue-200">1</button>
-                        <button class="w-12 h-12 flex items-center justify-center rounded-2xl text-slate-600 font-bold hover:bg-slate-50 transition">2</button>
-                        <button class="w-12 h-12 flex items-center justify-center rounded-2xl text-slate-600 font-bold hover:bg-slate-50 transition">3</button>
-                        <span class="px-2 text-slate-300">...</span>
-                        <button class="w-12 h-12 flex items-center justify-center rounded-2xl text-slate-400 hover:bg-slate-50 transition">
-                            <i class="fas fa-chevron-right text-xs"></i>
-                        </button>
-                    </nav>
+                <!-- Boutons d'action -->
+                <div class="flex flex-col sm:flex-row gap-3">
+                    <button id="resetFilters"
+                        class="px-6 py-3 bg-slate-100 text-slate-700 font-bold rounded-xl hover:bg-slate-200 transition flex items-center justify-center gap-2">
+                        <i class="fas fa-redo"></i>
+                        Réinitialiser
+                    </button>
+                    <button id="applyFilters"
+                        class="px-6 py-3 bg-blue-600 text-white font-bold rounded-xl hover:bg-blue-700 transition flex items-center justify-center gap-2 shadow-lg shadow-blue-100">
+                        <i class="fas fa-filter"></i>
+                        Appliquer
+                    </button>
                 </div>
             </div>
-        </div>
-    </main>
+        </form>
+    </div>
 
-    <footer class="bg-slate-900 text-slate-400 py-12 mt-20">
-        <div class="max-w-7xl mx-auto px-4 text-center">
-            <div class="flex items-center justify-center gap-2 mb-6 opacity-50">
-                <i class="fas fa-car-side text-blue-500"></i>
-                <span class="text-xl font-black text-white tracking-tighter">MaBagnole</span>
-            </div>
-            <p class="text-xs font-bold uppercase tracking-[0.3em]">© 2026 Tous droits réservés.</p>
+    <div class="bg-white rounded-[2rem] p-6 shadow-sm border border-slate-100">
+        <table id="vehiclesTable" class="vehiclesContainer display min-w-full">
+            <thead>
+                <tr class="border-b border-slate-100">
+                    <th class="text-left py-4 px-6 text-xs font-black uppercase tracking-widest text-slate-400">Image</th>
+                    <th class="text-left py-4 px-6 text-xs font-black uppercase tracking-widest text-slate-400">Véhicule</th>
+                    <th class="text-left py-4 px-6 text-xs font-black uppercase tracking-widest text-slate-400">Prix/Jour</th>
+                    <th class="text-left py-4 px-6 text-xs font-black uppercase tracking-widest text-slate-400">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php foreach ($vehicles as $vehicle): ?>
+                    <tr class="border-b border-slate-50 hover:bg-slate-50 transition">
+                        <td class="py-4 px-6">
+                            <img src="<?= $vehicle['image_url'] ?>"
+                                class="w-24 h-16 rounded-xl object-cover shadow-sm"
+                                onerror="this.src='https://images.unsplash.com/photo-1549399542-7e3f8b79c341?w=120&h=80'">
+                        </td>
+                        <td class="py-4 px-6">
+                            <div>
+                                <h4 class="font-bold text-slate-900 text-lg"><?= htmlspecialchars($vehicle['marque']) ?> <?= htmlspecialchars($vehicle['modele']) ?></h4>
+                                <p class="text-blue-600 text-xs font-bold uppercase tracking-widest mt-1"><?= $vehicle['categorie'] ?></p>
+                                <div class="flex flex-wrap gap-2 mt-2">
+                                    <span class="text-xs text-slate-500">
+                                        <i class="fas fa-gas-pump mr-1"></i> <?= $vehicle['carburant'] ?>
+                                    </span>
+                                    <span class="text-xs text-slate-500">•</span>
+                                    <span class="text-xs text-slate-500">
+                                        <i class="fas fa-users mr-1"></i> <?= $vehicle['nb_places'] ?> places
+                                    </span>
+                                    <span class="text-xs text-slate-500">•</span>
+                                    <span class="text-xs text-slate-500">
+                                        <i class="fas fa-calendar mr-1"></i> <?= $vehicle['annee'] ?>
+                                    </span>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="py-4 px-6">
+                            <div class="text-center">
+                                <span class="text-2xl font-black text-slate-900 block"><?= number_format($vehicle['prix_journalier'], 2) ?>€</span>
+                                <span class="text-xs text-slate-400">/ jour</span>
+                                <div class="mt-2">
+                                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold
+                                    <?= $vehicle['disponible']
+                                        ? 'bg-emerald-100 text-emerald-800'
+                                        : 'bg-red-100 text-red-800' ?>">
+                                        <?= $vehicle['disponible'] ? 'Disponible' : 'Indisponible' ?>
+                                    </span>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="py-4 px-6">
+                            <div class="flex flex-col gap-2">
+                                <a href="detaill-vehicules.php?id=<?= $vehicle['id'] ?>"
+                                    class="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-blue-600 text-white text-sm font-bold rounded-xl hover:bg-blue-700 transition shadow-sm">
+                                    <i class="fas fa-eye"></i> Voir détails
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                <?php endforeach; ?>
+            </tbody>
+        </table>
+    </div>
+</main>
+
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+<script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+
+<script>
+    
+    $(document).ready(function() {
+        var table = $('#vehiclesTable').DataTable({
+            "searching": false,
+            "info": true,
+            "paging": true,
+            "pageLength": 3,
+            "lengthChange": true,
+            "lengthMenu": [3, 6, 9, 12],
+
+            "ordering": false,
+            "filter": false,
+
+            "language": {
+                "lengthMenu": "Afficher _MENU_ véhicules par page",
+                "zeroRecords": "Aucun véhicule trouvé",
+                "info": "Affichage _START_ à _END_ sur _TOTAL_ véhicules",
+                "infoEmpty": "Affichage 0 à 0 sur 0 véhicules",
+                "infoFiltered": "",
+                "paginate": {
+                    "first": "Premier",
+                    "last": "Dernier",
+                    "next": "Suivant",
+                    "previous": "Précédent"
+                }
+            },
+
+            "drawCallback": function() {
+                $('.paginate_button').addClass('px-4 py-2 mx-1 rounded-lg font-medium transition-all');
+                $('.paginate_button.current').addClass('bg-blue-600 text-white shadow-md');
+                $('.paginate_button:not(.current)').addClass('text-slate-700 hover:bg-slate-100');
+                $('.paginate_button.disabled').addClass('text-slate-300 cursor-not-allowed hover:bg-transparent');
+            }
+        });
+
+        $('.dataTables_length select').addClass('px-4 py-2 border border-slate-200 rounded-lg text-sm focus:border-blue-600 focus:ring-1 focus:ring-blue-600 outline-none');
+
+        $('#applyFilters').on('click', function() {
+            alert('Fonctionnalité de filtrage à implémenter ultérieurement.');
+        });
+
+        $('#resetFilters').on('click', function() {
+            $('#filterCategory').val('');
+            $('#filterDisponibility').val('');
+            $('#filterPrice').val('');
+            alert('Filtres réinitialisés.');
+        });
+    });
+</script>
+
+<style>
+    .dataTables_wrapper .dataTables_paginate {
+        @apply flex items-center gap-1;
+    }
+
+    .dataTables_wrapper .dataTables_paginate .paginate_button {
+        @apply min-w-[44px] h-11 flex items-center justify-center rounded-xl text-sm font-semibold transition-all duration-200;
+    }
+
+    .dataTables_wrapper .dataTables_paginate .paginate_button.current {
+        @apply bg-blue-600 text-white shadow-lg !important;
+    }
+
+    .dataTables_wrapper .dataTables_paginate .paginate_button:hover:not(.current) {
+        @apply bg-slate-100 text-blue-600;
+    }
+
+    .dataTables_wrapper .dataTables_paginate .paginate_button.disabled {
+        @apply text-slate-300 cursor-not-allowed hover:bg-transparent;
+    }
+
+    /* Info texte */
+    .dataTables_wrapper .dataTables_info {
+        @apply text-slate-500 text-sm font-medium;
+    }
+
+    /* Sélecteur d'éléments par page */
+    .dataTables_length {
+        @apply mb-4;
+    }
+
+    .dataTables_length label {
+        @apply flex items-center gap-3 text-slate-600 text-sm font-medium;
+    }
+
+    /* Cacher complètement la recherche */
+    .dataTables_filter {
+        display: none !important;
+    }
+
+    /* Pas de tri au clic sur les en-têtes */
+    table.dataTable thead th.sorting {
+        cursor: default !important;
+    }
+
+    table.dataTable thead th.sorting:after {
+        display: none !important;
+    }
+
+    /* Styles pour la barre de filtres */
+    #filterPrice::-webkit-outer-spin-button,
+    #filterPrice::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+
+    #filterPrice {
+        -moz-appearance: textfield;
+    }
+</style>
+
+<footer class="bg-slate-900 text-slate-400 py-12 mt-20">
+    <div class="max-w-7xl mx-auto px-4 text-center">
+        <div class="flex items-center justify-center gap-2 mb-6 opacity-50">
+            <i class="fas fa-car-side text-blue-500"></i>
+            <span class="text-xl font-black text-white tracking-tighter">MaBagnole</span>
         </div>
-    </footer>
+        <p class="text-xs font-bold uppercase tracking-[0.3em]">© 2026 Tous droits réservés.</p>
+    </div>
+</footer>
 
 </body>
 
