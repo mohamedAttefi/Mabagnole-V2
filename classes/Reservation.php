@@ -241,7 +241,7 @@ class Reservation
     {
         self::initPDO();
 
-        $sql = "SELECT r.*, v.marque, v.modele, v.carburant ,v.annee, v.immatriculation, v.prix_journalier, v.image_url, u.nom
+        $sql = "SELECT r.*, v.marque, v.modele, v.carburant ,v.annee, v.immatriculation, v.prix_journalier, v.image_url, u.nom, v.categorie
                     FROM reservations r
                     JOIN listevehicules v ON r.vehicule_id = v.id
                     JOIN utilisateurs u ON r.client_id = u.id where 1=1";
