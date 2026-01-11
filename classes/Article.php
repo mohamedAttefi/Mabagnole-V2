@@ -37,7 +37,7 @@ class Article
         self::initPDO();
         $sql = "SELECT *, b.id as article_id, u.nom as user_name,u.id as user_id, t.id as theme_id, t.name as theme_name from blog_articles b join themes t on b.theme_id = t.id join utilisateurs u on b.user_id = u.id where 1=1";
         $params = [];
-        if($statut){
+        if ($statut) {
             $sql .= " and status = ?";
             $params[] = $statut;
         }
@@ -83,5 +83,22 @@ class Article
         } else {
             return null;
         }
+    }
+
+    public static function updateArticleStatus($statut, $id)
+    {
+        self::initPDO();
+        $stmt = self::$pdo->prepare("update blog_articles set status = ? where id = ?");
+        $stmt->execute([$statut, $id]);
+    }
+
+    public static function paginate($page = 1, $limit = 6)
+    {
+        self::initPDO();
+        $offset = ($page - 1) * $limit;
+        $sql = "SELECT *, b.id as article_id, u.nom as user_name,u.id as user_id, t.id as theme_id, t.name as theme_name from blog_articles b join themes t on b.theme_id = t.id join utilisateurs u on b.user_id = u.id where 1=1 ORDER BY b.created_at DESC LIMIT $limit OFFSET $offset";
+        $stmt = self::$pdo->prepare($sql);
+        $stmt->execute();
+        return $stmt->fetchAll();
     }
 }
