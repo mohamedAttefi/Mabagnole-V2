@@ -26,6 +26,19 @@ class Categorie
         }
     }
 
+    public static function find($id)
+    {
+        try {
+            self::initPDO();
+
+            $stmt = self::$pdo->prepare("SELECT * FROM categories WHERE id = ?");
+            $stmt->execute([$id]);
+            return $stmt->fetch(PDO::FETCH_ASSOC);
+        } catch (Exception $e) {
+            return null;
+        }
+    }
+
     public function __get($att)
     {
         return $this->$att;
@@ -77,7 +90,8 @@ class Categorie
         $stmt = self::$pdo->prepare("insert into categories(nom, description) values(?,?)");
         $stmt->execute([$this->nom, $this->description]);
     }
-    public static function findById($id){
+    public static function findById($id)
+    {
         self::initPDO();
         $stmt = self::$pdo->prepare("SELECT * FROM categories WHERE disponible = 1 and id = ?");
         $stmt->execute([$id]);
@@ -85,11 +99,10 @@ class Categorie
         return new Categorie($row["nom"], $row["description"], null, $row["id"]);
     }
 
-    public function update($newName, $newDescription){
+    public function update($newName, $newDescription)
+    {
         self::initPDO();
         $stmt = self::$pdo->prepare("update categories set nom = ?, description = ? where id = ?");
         $stmt->execute([$newName, $newDescription, $this->id]);
     }
-
-
 }
