@@ -12,6 +12,9 @@ session_start();
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
     <style>
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
@@ -206,6 +209,7 @@ session_start();
             transform: translateY(-10px);
         }
     </style>
+
 </head>
 
 <body class="bg-[#F8FAFC] text-slate-900">
@@ -280,13 +284,11 @@ session_start();
                             </div>
                         <?php endif; ?>
 
-                        <!-- Bouton Déconnexion -->
                         <a href="/MABAGNOLE-V2/public/logout.php" class="bg-red-500 text-white px-6 py-2.5 rounded-full hover:bg-red-600 transition shadow-lg shadow-red-100">
                             <i class="fas fa-sign-out-alt mr-2"></i>Déconnexion
                         </a>
 
                     <?php else: ?>
-                        <!-- Utilisateur non connecté -->
                         <div class="h-6 w-px bg-slate-200"></div>
                         <a href="/MABAGNOLE-V2/public/login.php" class="text-slate-600 hover:text-blue-600 transition">Connexion</a>
                         <a href="register.php" class="bg-slate-900 text-white px-7 py-3 rounded-full hover:bg-blue-600 transition shadow-lg shadow-blue-100">
