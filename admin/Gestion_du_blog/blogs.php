@@ -5,18 +5,21 @@ if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] !== 'admin') {
     exit();
 }
 include "../../classes/Article.php";
-include "../header.php";
 $articles = Article::all();
 $articles_publie = Article::all("approved");
 $articles_enAttente = Article::all("pending");
 
 
-if(isset($_GET["id_reject"])){
-    
+if (isset($_GET["id_reject"])) {
+    Article::updateArticleStatus("rejected", $_GET["id_reject"]);
+    header("location: blogs.php");
 }
-if(isset($_GET["id_approuve"])){
-    
+if (isset($_GET["id_approuve"])) {
+    Article::updateArticleStatus("approved", $_GET["id_approuve"]);
+    header("location: blogs.php");
 }
+include "../header.php";
+
 
 ?>
 
@@ -201,21 +204,21 @@ if(isset($_GET["id_approuve"])){
                                         <button class="bg-blue-100 text-blue-600 p-2 rounded-lg hover:bg-blue-200 transition" title="Voir">
                                             <i class="fas fa-eye"></i>
                                         </button>
-                                     
+
                                         <?php if ($article["status"] == "approved") { ?>
-                                            <a href="blogs.php?id_reject=<?= $article["id"] ?>" class="bg-red-100 text-red-600 p-2 rounded-lg hover:bg-red-200 transition" title="Rejecteé">
+                                            <a href="blogs.php?id_reject=<?= $article["article_id"] ?>" class="bg-red-100 text-red-600 p-2 rounded-lg hover:bg-red-200 transition" title="Rejecteé">
                                                 <i class="fa-solid fa-ban" style="color: #ff0000;"></i>
                                             </a>
                                         <?php } elseif ($article["status"] == "pending") { ?>
-                                            <a href="blogs.php?id_approuve=<?= $article["id"] ?>" class="bg-green-100 text-green-600 p-2 rounded-lg hover:bg-green-200 transition" title="Approuvée">
+                                            <a href="blogs.php?id_approuve=<?= $article["article_id"] ?>" class="bg-green-100 text-green-600 p-2 rounded-lg hover:bg-green-200 transition" title="Approuvée">
                                                 <i class="fa-solid fa-check" style="color: #1ae000;"></i>
                                             </a>
-                                            <a href="blogs.php?id_reject=<?= $article["id"] ?>" class="bg-red-100 text-red-600 p-2 rounded-lg hover:bg-red-200 transition" title="Rejecteé">
+                                            <a href="blogs.php?id_reject=<?= $article["article_id"] ?>" class="bg-red-100 text-red-600 p-2 rounded-lg hover:bg-red-200 transition" title="Rejecteé">
                                                 <i class="fa-solid fa-ban" style="color: #ff0000;"></i>
 
                                             </a>
                                         <?php } else { ?>
-                                            <a href="blogs.php?id_approuve=<?= $article["id"] ?>" class="bg-green-100 text-green-600 p-2 rounded-lg hover:bg-green-200 transition" title="Approuvée">
+                                            <a href="blogs.php?id_approuve=<?= $article["article_id"] ?>" class="bg-green-100 text-green-600 p-2 rounded-lg hover:bg-green-200 transition" title="Approuvée">
                                                 <i class="fa-solid fa-check" style="color: #1ae000;"></i>
                                             </a>
                                         <?php } ?>
@@ -224,7 +227,7 @@ if(isset($_GET["id_approuve"])){
                             </tr>
                         <?php } ?>
 
-                        
+
                     </tbody>
                 </table>
             </div>
