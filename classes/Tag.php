@@ -25,7 +25,7 @@ class Tag
     public static function all()
     {
         self::initPDO();
-        $stmt = self::$pdo->prepare("select * from blog_tags");
+        $stmt = self::$pdo->prepare("select *, count(a.article_id) as total_articles from blog_tags t left join article_tags a on t.id = a.tag_id GROUP BY t.id");
         $result = $stmt->execute();
         if ($result) {
             return $stmt->fetchall();
